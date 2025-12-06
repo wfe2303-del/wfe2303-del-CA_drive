@@ -30,8 +30,14 @@
     .btn:hover{border-color:var(--accent-strong);box-shadow:0 0 0 3px rgba(96,165,250,.2)}
     .btn.acc{background:var(--accent);border-color:var(--accent);color:#fff}
     .btn.acc:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+    .btn-sm{
+      height:30px;
+      padding:0 10px;
+      border-radius:999px;
+      font-size:12px;
+    }
 
-    /* ✅ 큰 버튼용 */
+    /* 큰 버튼 */
     .btn-lg{
       height:52px;
       padding:0 26px;
@@ -66,7 +72,14 @@
     .admin-drawer .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:none;margin:0 0 12px}
     .admin-drawer h4{margin:0 0 8px;font-weight:700}
     .admin-drawer label{color:#64748b;font-size:13px;margin:6px 0 4px}
-    .admin-drawer input{height:42px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+    .admin-drawer input, .input{
+      height:42px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+      width:100%;outline:none;font:14px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    }
+    .input:focus, .admin-drawer input:focus{
+      border-color:var(--accent-strong);
+      box-shadow:0 0 0 3px rgba(96,165,250,.3);
+    }
     .admin-drawer .btn{height:36px;padding:0 12px;border-radius:12px}
     #admList{border-collapse:collapse;width:100%}
     #admMeta{color:#94a3b8;margin-top:8px}
@@ -97,7 +110,7 @@
     .gear-btn{
       position:fixed;top:16px;right:16px;z-index:50;
       background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;cursor:pointer;
-      display:none; /* ✅ 기본은 숨김, 입장자 스크린에서만 보이게 */
+      display:none;
     }
 
     .admin-overlay{position:fixed;inset:0;background:rgba(15,23,42,.28);backdrop-filter:saturate(140%) blur(2px);visibility:hidden;opacity:0;pointer-events:none;transition:.15s;z-index:60}
@@ -106,7 +119,6 @@
     .admin-drawer.open{transform:translateX(0);opacity:1;pointer-events:auto}
     .x-btn{appearance:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px 8px;cursor:pointer}
 
-    /* ✅ 기능 버튼 스타일 */
     .feature-buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
     .feature-btn{
       border-radius:999px;
@@ -142,15 +154,47 @@
       background:#f4f4f5;
     }
 
-    /* 로그인 카드 약간 히어로 느낌 */
     #authCard{
       border-radius:18px;
       background:linear-gradient(135deg,#eff6ff,#f9fafb);
       border-color:#dbeafe;
     }
-    #authCard .row{justify-content:flex-start}
-    #authState{font-size:13px}
 
+    /* 세일즈 멘트 영역 */
+    .sales-layout{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+    .sales-left{flex:1;min-width:280px}
+    .sales-right{flex:2;min-width:340px}
+    .sales-card{border-radius:14px;border:1px solid var(--line);padding:12px 14px;background:#fff}
+    .sales-meta{font-size:12px;color:#94a3b8;margin-top:4px}
+
+    /* 드라이브 링크 카드 */
+    .drive-card{
+      position:relative;
+      width:220px;
+      padding:14px 14px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:linear-gradient(135deg,#f8fafc,#eef2ff);
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .drive-card-title{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .drive-card-id{font-size:11px;color:#94a3b8}
+    .drive-card .badge{
+      font-size:11px;
+      padding:2px 8px;
+      border-radius:999px;
+      background:rgba(37,99,235,.08);
+      color:#1d4ed8;
+      align-self:flex-start;
+    }
+    .drive-del-btn{
+      position:absolute;top:6px;right:6px;
+      border-radius:999px;
+      font-size:11px;
+    }
   </style>
 </head>
 <body>
@@ -181,7 +225,7 @@
       <div id="authErr" class="err" style="margin-top:6px"></div>
     </div>
 
-    <!-- 기능 선택 메뉴 (로그인 후에만 표시) -->
+    <!-- 기능 선택 메뉴 -->
     <div class="card" id="featureMenuCard" style="display:none">
       <label>기능 선택</label>
       <div class="feature-buttons">
@@ -193,13 +237,13 @@
           <span class="feature-icon">🤖</span>
           <span>챗봇 데이터 (준비중)</span>
         </button>
-        <button id="featureBtnSales" class="btn feature-btn" type="button" disabled>
+        <button id="featureBtnSales" class="btn feature-btn" type="button">
           <span class="feature-icon">💬</span>
-          <span>세일즈 멘트 GPTs (준비중)</span>
+          <span>세일즈 멘트 GPTs</span>
         </button>
-        <button id="featureBtnDrive" class="btn feature-btn" type="button" disabled>
+        <button id="featureBtnDrive" class="btn feature-btn" type="button">
           <span class="feature-icon">📂</span>
-          <span>드라이브 링크 모음 (준비중)</span>
+          <span>드라이브 폴더 모음</span>
         </button>
         <button id="featureBtnCsv" class="btn feature-btn" type="button" disabled>
           <span class="feature-icon">📊</span>
@@ -207,14 +251,13 @@
         </button>
       </div>
       <div class="hint" style="margin-top:6px">
-        Google 로그인 후 사용하고 싶은 기능 버튼을 눌러주세요.  
-        (지금은 <strong>카톡 입장자 체크</strong>만 연결되어 있고, 나머지는 이후 코드 받으면 붙일 예정입니다.)
+        Google 로그인 후 사용하고 싶은 기능 버튼을 눌러주세요.
       </div>
     </div>
 
-    <!-- 기능별 섹션 컨테이너 -->
+    <!-- 기능별 섹션 -->
     <div id="featureContainer">
-      <!-- ✅ 입장자 체크 섹션 -->
+      <!-- ✅ 입장자 체크 -->
       <section id="featureEntrant" data-feature-section="entrant" style="display:none">
         <div class="panels">
           <!-- Panel A -->
@@ -323,14 +366,82 @@
         </div>
       </section>
 
-      <!-- 나중에 붙일 자리들 (지금은 숨김) -->
+      <!-- ✅ 세일즈 멘트 GPTs -->
+      <section id="featureSales" data-feature-section="sales" style="display:none">
+        <div class="card">
+          <h2 style="margin-top:0;margin-bottom:8px">세일즈 멘트 자동 생성 (GPTs)</h2>
+          <div class="hint" style="margin-bottom:12px">
+            타깃과 멘트 종류를 선택하면 GPT로부터 멘트를 받아옵니다. (백엔드 Apps Script 필요)
+          </div>
+
+          <div class="sales-layout">
+            <!-- 좌측: 설정 -->
+            <div class="sales-left">
+              <label>타깃</label>
+              <input id="salesTarget" class="input" placeholder="예: 40~50대 주부 / 직장인">
+
+              <label style="margin-top:10px">멘트 종류</label>
+              <select id="salesType">
+                <option value="start">무료강의 시작 멘트</option>
+                <option value="entry">입장 유도 멘트</option>
+                <option value="payment">본강의 결제 유도 멘트</option>
+                <option value="closing">마무리 멘트</option>
+              </select>
+
+              <label style="margin-top:10px">멘트 개수</label>
+              <input id="salesCount" class="input" type="number" min="1" max="20" value="5">
+
+              <label style="margin-top:10px">추가 설명(선택)</label>
+              <textarea id="salesNotes" class="input" rows="3" style="resize:vertical"
+                placeholder="예: 쿠팡 쇼핑숏츠 강의, 영끌남 크루, 부담감 줄이는 톤 등"></textarea>
+
+              <button id="salesGenBtn" class="btn acc" style="margin-top:14px">멘트 생성</button>
+              <div id="salesErr" class="err" style="margin-top:6px"></div>
+            </div>
+
+            <!-- 우측: 생성 결과 + 저장된 멘트 -->
+            <div class="sales-right">
+              <div class="sales-card">
+                <div class="row" style="justify-content:space-between;align-items:center">
+                  <h3 style="margin:0;font-size:15px">생성된 멘트</h3>
+                  <span class="sales-meta" id="salesGenMeta"></span>
+                </div>
+                <div id="salesResults" style="display:grid;gap:8px;margin-top:8px"></div>
+              </div>
+
+              <div class="sales-card" style="margin-top:10px">
+                <div class="row" style="justify-content:space-between;align-items:center">
+                  <h3 style="margin:0;font-size:15px">저장된 멘트</h3>
+                  <button id="salesClearSaved" class="btn btn-sm">전체 삭제</button>
+                </div>
+                <div class="sales-meta">로컬에만 저장됩니다.(이 브라우저에서만)</div>
+                <div id="salesSavedList" style="display:grid;gap:8px;margin-top:8px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ✅ 드라이브 폴더 링크 모음 -->
+      <section id="featureDrive" data-feature-section="drive" style="display:none">
+        <div class="card">
+          <h2 style="margin-top:0;margin-bottom:8px">드라이브 폴더 모음</h2>
+          <div class="hint" style="margin-bottom:10px">
+            자주 사용하는 강의 / 기수별 드라이브 폴더를 카드로 저장해두고 바로 열 수 있습니다.
+          </div>
+          <button class="btn acc" id="addDriveBtn">+ 폴더 추가</button>
+          <div id="driveErr" class="err" style="margin-top:6px"></div>
+          <div id="driveFolderList" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px"></div>
+        </div>
+      </section>
+
+      <!-- 챗봇/CSV는 나중용 자리 -->
       <section id="featureChatbot" data-feature-section="chatbot" style="display:none"></section>
-      <section id="featureSales" data-feature-section="sales" style="display:none"></section>
-      <section id="featureDrive" data-feature-section="drive" style="display:none"></section>
       <section id="featureCsv" data-feature-section="csv" style="display:none"></section>
     </div>
   </div>
 
+  <!-- 관리자 패널 (입장자 체크 전용) -->
   <div id="adminOverlay" class="admin-overlay" aria-hidden="true"></div>
   <aside id="adminDrawer" class="admin-drawer" aria-hidden="true">
     <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -410,10 +521,12 @@ const FIXED_WRITE_SHEET='공유용 시트';
 /* ✅ 여기에 본인 OAuth 클라이언트 ID 넣기 */
 const CLIENT_ID="18228268359-iifm4ck3j9kqj74eh1p90tco1k2mbpi0.apps.googleusercontent.com";
 
+/* ✅ GPTs 백엔드 Apps Script URL (웹 앱 배포 URL로 교체) */
+const SALES_API_ENDPOINT = "https://script.google.com/macros/s/여기에_웹앱_URL/exec";
+
 /* ===== OAuth ===== */
 let accessToken=null,tokenClient=null;
 
-/* ✅ 관리자(⚙) 노출 제어: 카톡 입장자 스크린에서만 */
 function updateAdminVisibility(featureKey){
   const gear=$$('settingsBtn');
   if(!gear)return;
@@ -435,7 +548,7 @@ function setFeatureVisibility(isLoggedIn){
   }
 }
 
-/* ✅ 스크린 전환 (가짜 페이지) */
+/* 스크린 전환 */
 function showFeatureSection(key){
   document.querySelectorAll('[data-feature-section]').forEach(sec=>{
     sec.style.display = (sec.dataset.featureSection===key)?'block':'none';
@@ -455,8 +568,6 @@ function initAuth(){
         txt('authState','로그인 완료');
         txt('authErr','');
         setFeatureVisibility(true);
-        // 첫 로그인 시 기본으로 입장자 체크 스크린 열어주고 싶으면 아래 주석 해제:
-        // showFeatureSection('entrant');
       },
       error_callback:err=>{
         txt('authErr','OAuth 오류: '+(err?.error||err?.type||JSON.stringify(err)));
@@ -582,7 +693,7 @@ function onPackChanged(sfx){
   (p.sheets||[]).forEach(t=>{if(readSel)readSel.appendChild(new Option(t,t));});
 }
 
-/* ===== 드라이브 폴더 / 파일 ===== */
+/* ===== 드라이브 (입장자 체크용 txt/csv) ===== */
 let driveFolderId={A:null,B:null};
 let driveFiles={A:[],B:[]};
 
@@ -654,7 +765,6 @@ async function refreshDriveList(sfx){
   }
 }
 
-/* ✅ txt / csv 읽기 : csv는 C열만 */
 async function readSelectedTxt(sfx){
   const idxStr=val('dirFileSelect',sfx);
   if(!idxStr)throw new Error('폴더 내 파일을 선택하세요.');
@@ -717,7 +827,7 @@ function parseChat(text){
   return{events,joinedCount,leftCount};
 }
 
-/* ===== 실행 ===== */
+/* ===== 실행 (입장자 체크) ===== */
 async function runMain(sfx){
   try{
     txt('err','',sfx);
@@ -918,7 +1028,7 @@ async function runMain(sfx){
   }
 }
 
-/* ===== 데모 ===== */
+/* ===== 데모 (입장자) ===== */
 function runDemo(sfx){
   txt('err','',sfx);
   const resultsEl=byPanel('results',sfx);
@@ -1030,20 +1140,331 @@ function runDemo(sfx){
   resTbl('미확인 목록(데모)',['name','reason'],unresolved);
 }
 
+/* ===== 공통: 클립보드 ===== */
+async function copyToClipboard(text){
+  try{
+    if(navigator.clipboard?.writeText){
+      await navigator.clipboard.writeText(text);
+    }else{
+      const ta=document.createElement('textarea');
+      ta.value=text;
+      ta.style.position='fixed';
+      ta.style.opacity='0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    alert('복사되었습니다.');
+  }catch(e){
+    alert('복사 실패: '+e.message);
+  }
+}
+
+/* ===== 세일즈 멘트 GPTs ===== */
+const SALES_SAVED_KEY = 'ca_sales_saved_v1';
+
+function loadSalesSaved(){
+  try{return JSON.parse(localStorage.getItem(SALES_SAVED_KEY)||'[]');}
+  catch(e){return[];}
+}
+function saveSalesSaved(list){
+  localStorage.setItem(SALES_SAVED_KEY,JSON.stringify(list));
+}
+
+function renderSalesSaved(){
+  const box=$$('#salesSavedList');
+  if(!box)return;
+  const list=loadSalesSaved();
+  box.innerHTML='';
+  if(!list.length){
+    const empty=document.createElement('div');
+    empty.className='hint';
+    empty.textContent='저장된 멘트가 없습니다.';
+    box.appendChild(empty);
+    return;
+  }
+  list.forEach(item=>{
+    const wrap=document.createElement('div');
+    wrap.className='sales-card';
+    wrap.style.background='#f8fafc';
+    const topRow=document.createElement('div');
+    topRow.className='row';
+    topRow.style.justifyContent='space-between';
+    const title=document.createElement('div');
+    title.style.fontSize='13px';
+    title.innerHTML=`<strong>${item.typeLabel||'멘트'}</strong> · <span style="color:#64748b">${item.target||''}</span>`;
+    const btnRow=document.createElement('div');
+    btnRow.className='row';
+    const copyBtn=document.createElement('button');
+    copyBtn.className='btn btn-sm';
+    copyBtn.textContent='복사';
+    copyBtn.addEventListener('click',()=>copyToClipboard(item.content));
+    const delBtn=document.createElement('button');
+    delBtn.className='btn btn-sm';
+    delBtn.textContent='삭제';
+    delBtn.addEventListener('click',()=>{
+      const cur=loadSalesSaved().filter(x=>x.id!==item.id);
+      saveSalesSaved(cur);
+      renderSalesSaved();
+    });
+    btnRow.appendChild(copyBtn);
+    btnRow.appendChild(delBtn);
+    topRow.appendChild(title);
+    topRow.appendChild(btnRow);
+
+    const ta=document.createElement('textarea');
+    ta.className='input';
+    ta.style.marginTop='6px';
+    ta.style.resize='vertical';
+    ta.value=item.content;
+    ta.rows=3;
+    ta.addEventListener('change',()=>{
+      const cur=loadSalesSaved();
+      const idx=cur.findIndex(x=>x.id===item.id);
+      if(idx>=0){cur[idx].content=ta.value;saveSalesSaved(cur);}
+    });
+
+    const meta=document.createElement('div');
+    meta.className='sales-meta';
+    meta.textContent=new Date(item.createdAt||Date.now()).toLocaleString();
+
+    wrap.appendChild(topRow);
+    wrap.appendChild(ta);
+    wrap.appendChild(meta);
+    box.appendChild(wrap);
+  });
+}
+
+function salesTypeLabel(type){
+  switch(type){
+    case 'start': return '무료강의 시작 멘트';
+    case 'entry': return '입장 유도 멘트';
+    case 'payment': return '결제 유도 멘트';
+    case 'closing': return '마무리 멘트';
+    default: return '멘트';
+  }
+}
+
+async function generateSalesMent(){
+  const target=$$('#salesTarget')?.value.trim()||'';
+  const type=$$('#salesType')?.value||'start';
+  const count=parseInt(($$('#salesCount')?.value||'5'),10)||5;
+  const notes=$$('#salesNotes')?.value.trim()||'';
+  const errEl=$$('#salesErr');
+  const metaEl=$$('#salesGenMeta');
+  const box=$$('#salesResults');
+  if(errEl)errEl.textContent='';
+  if(box)box.innerHTML='';
+  if(metaEl)metaEl.textContent='';
+
+  if(!SALES_API_ENDPOINT || SALES_API_ENDPOINT.includes('여기에_웹앱_URL')){
+    if(errEl)errEl.textContent='백엔드 URL이 설정되어 있지 않습니다. 상단 스크립트의 SALES_API_ENDPOINT를 수정하세요.';
+    return;
+  }
+
+  try{
+    const payload={target,type,count,notes};
+    if(metaEl)metaEl.textContent='생성 중...';
+    const res=await fetch(SALES_API_ENDPOINT,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    if(!res.ok)throw new Error('백엔드 오류: '+(await res.text()));
+    const data=await res.json();
+    const messages=Array.isArray(data.messages)?data.messages:[];
+
+    if(!messages.length){
+      throw new Error('응답에 멘트가 없습니다. 백엔드 로직을 확인하세요.');
+    }
+    renderSalesGenerated(messages,{target,type});
+    if(metaEl)metaEl.textContent=`${messages.length}개 생성 완료`;
+  }catch(e){
+    if(errEl)errEl.textContent='멘트 생성 실패: '+(e?.message||e);
+    if(metaEl)metaEl.textContent='';
+  }
+}
+
+function renderSalesGenerated(list,ctx){
+  const box=$$('#salesResults');
+  if(!box)return;
+  box.innerHTML='';
+  list.forEach((msg,idx)=>{
+    const wrap=document.createElement('div');
+    wrap.className='sales-card';
+
+    const topRow=document.createElement('div');
+    topRow.className='row';
+    topRow.style.justifyContent='space-between';
+    const title=document.createElement('div');
+    title.style.fontSize='13px';
+    title.innerHTML=`<strong>멘트 ${idx+1}</strong> · <span style="color:#64748b">${salesTypeLabel(ctx.type)}</span>`;
+    const btnRow=document.createElement('div');
+    btnRow.className='row';
+    const copyBtn=document.createElement('button');
+    copyBtn.className='btn btn-sm';
+    copyBtn.textContent='복사';
+    copyBtn.addEventListener('click',()=>copyToClipboard(msg));
+    const saveBtn=document.createElement('button');
+    saveBtn.className='btn btn-sm';
+    saveBtn.textContent='저장';
+    saveBtn.addEventListener('click',()=>{
+      const cur=loadSalesSaved();
+      const item={
+        id:`${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+        type:ctx.type,
+        typeLabel:salesTypeLabel(ctx.type),
+        target:ctx.target,
+        content:msg,
+        createdAt:Date.now()
+      };
+      cur.push(item);
+      saveSalesSaved(cur);
+      renderSalesSaved();
+      alert('저장되었습니다.');
+    });
+    btnRow.appendChild(copyBtn);
+    btnRow.appendChild(saveBtn);
+    topRow.appendChild(title);
+    topRow.appendChild(btnRow);
+
+    const body=document.createElement('div');
+    body.style.marginTop='6px';
+    body.style.whiteSpace='pre-wrap';
+    body.textContent=msg;
+
+    wrap.appendChild(topRow);
+    wrap.appendChild(body);
+    box.appendChild(wrap);
+  });
+}
+
+/* ===== 드라이브 폴더 링크 모음 ===== */
+const DRIVE_LINK_KEY='ca_drive_links_v1';
+
+function loadDriveLinks(){
+  try{return JSON.parse(localStorage.getItem(DRIVE_LINK_KEY)||'[]');}
+  catch(e){return[];}
+}
+function saveDriveLinks(list){
+  localStorage.setItem(DRIVE_LINK_KEY,JSON.stringify(list));
+}
+function renderDriveLinks(){
+  const box=$$('#driveFolderList');
+  if(!box)return;
+  const list=loadDriveLinks();
+  box.innerHTML='';
+  if(!list.length){
+    const empty=document.createElement('div');
+    empty.className='hint';
+    empty.textContent='등록된 폴더가 없습니다. "+ 폴더 추가" 버튼으로 등록해보세요.';
+    box.appendChild(empty);
+    return;
+  }
+  list.forEach(item=>{
+    const card=document.createElement('div');
+    card.className='drive-card';
+    card.addEventListener('click',()=>{
+      const url=item.url || `https://drive.google.com/drive/folders/${item.id}`;
+      window.open(url,'_blank');
+    });
+
+    const icon=document.createElement('div');
+    icon.style.fontSize='22px';
+    icon.textContent='📁';
+
+    const title=document.createElement('div');
+    title.className='drive-card-title';
+    title.textContent=item.name || '(제목 없음)';
+
+    const badge=document.createElement('div');
+    badge.className='badge';
+    badge.textContent=item.label || '드라이브';
+
+    const idDiv=document.createElement('div');
+    idDiv.className='drive-card-id';
+    idDiv.textContent=item.id;
+
+    const delBtn=document.createElement('button');
+    delBtn.className='btn btn-sm drive-del-btn';
+    delBtn.textContent='×';
+    delBtn.addEventListener('click',ev=>{
+      ev.stopPropagation();
+      const cur=loadDriveLinks().filter(x=>x.id!==item.id);
+      saveDriveLinks(cur);
+      renderDriveLinks();
+    });
+
+    card.appendChild(icon);
+    card.appendChild(title);
+    card.appendChild(badge);
+    card.appendChild(idDiv);
+    card.appendChild(delBtn);
+    box.appendChild(card);
+  });
+}
+
+async function addDriveLink(){
+  const err=$$('#driveErr');
+  if(err)err.textContent='';
+  try{
+    const url=prompt('드라이브 폴더 URL 또는 ID를 입력하세요.','');
+    if(!url)return;
+    const idMatch=url.match(/folders\/([a-zA-Z0-9_-]+)/);
+    const folderId=idMatch?idMatch[1]:url.trim();
+    if(!folderId)throw new Error('폴더 ID를 인식하지 못했습니다.');
+
+    // 폴더 이름은 Drive API로 받아오기 (로그인 필요)
+    let name=folderId;
+    try{
+      name=await getDriveFolderName(folderId);
+    }catch(e){
+      console.warn('폴더 이름 조회 실패',e);
+    }
+    const labelPrompt=prompt('이 폴더에 붙일 라벨(선택):','');
+    const item={
+      id:folderId,
+      url:url.includes('http')?url:`https://drive.google.com/drive/folders/${folderId}`,
+      name,
+      label:labelPrompt||'드라이브'
+    };
+    const cur=loadDriveLinks();
+    cur.push(item);
+    saveDriveLinks(cur);
+    renderDriveLinks();
+  }catch(e){
+    if(err)err.textContent='폴더 추가 실패: '+(e?.message||e);
+  }
+}
+
 /* ===== 초기화 ===== */
 window.addEventListener('load',()=>{if(window.google?.accounts?.oauth2)initAuth();});
 document.addEventListener('DOMContentLoaded',()=>{
   on('gsLoginBtn','click',requestAccess);
   on('gsLogoutBtn','click',revokeAccess);
 
-  // 기능 버튼: 현재는 입장자 체크만 활성
+  // 기능 버튼
   const btnEntrant=$$('featureBtnEntrant');
   if(btnEntrant){
     btnEntrant.addEventListener('click',()=>{
       showFeatureSection('entrant');
     });
   }
+  const btnSales=$$('featureBtnSales');
+  if(btnSales){
+    btnSales.addEventListener('click',()=>{
+      showFeatureSection('sales');
+    });
+  }
+  const btnDrive=$$('featureBtnDrive');
+  if(btnDrive){
+    btnDrive.addEventListener('click',()=>{
+      showFeatureSection('drive');
+    });
+  }
 
+  // 관리자 패널
   const overlay=$$('adminOverlay'),drawer=$$('adminDrawer');
   const openAdmin=()=>{if(overlay&&drawer){show(overlay);show(drawer);renderAdmList();}};
   const closeAdmin=()=>{if(overlay&&drawer){hide(overlay);hide(drawer);}};
@@ -1054,7 +1475,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   on('admAdd','click',admAdd);
   on('admClearAll','click',()=>{if(confirm('모든 연결을 삭제할까요?')){clearPacks();renderAdmList();populatePacks('A');populatePacks('B');}});
 
-  // Panel A
+  // 입장자 패널 A/B
   on('sheetPackSelect','change',()=>onPackChanged('A'),'A');
   on('refreshMeta','click',()=>refreshMeta('A'),'A');
   on('runBtn','click',()=>runMain('A'),'A');
@@ -1062,7 +1483,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   on('dirPick','click',()=>pickDriveFolder('A'),'A');
   on('dirRefresh','click',()=>refreshDriveList('A'),'A');
 
-  // Panel B
   on('sheetPackSelect','change',()=>onPackChanged('B'),'B');
   on('refreshMeta','click',()=>refreshMeta('B'),'B');
   on('runBtn','click',()=>runMain('B'),'B');
@@ -1075,7 +1495,23 @@ document.addEventListener('DOMContentLoaded',()=>{
   refreshDriveList('A');
   refreshDriveList('B');
 
-  // 초기 상태: 로그인 전이니까 기능/⚙ 숨김
+  // 세일즈 멘트
+  const salesBtn=$$('#salesGenBtn');
+  if(salesBtn)salesBtn.addEventListener('click',generateSalesMent);
+  const clearSaved=$$('#salesClearSaved');
+  if(clearSaved)clearSaved.addEventListener('click',()=>{
+    if(confirm('저장된 멘트를 모두 삭제할까요?')){
+      saveSalesSaved([]);
+      renderSalesSaved();
+    }
+  });
+  renderSalesSaved();
+
+  // 드라이브 링크 모음
+  const addDriveBtn=$$('#addDriveBtn');
+  if(addDriveBtn)addDriveBtn.addEventListener('click',addDriveLink);
+  renderDriveLinks();
+
   setFeatureVisibility(false);
 });
 </script>
