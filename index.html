@@ -14,7 +14,7 @@
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
     .wrap{max-width:1200px;margin:28px auto;padding:0 16px}
-    h1{font-size:22px;margin:0 0 8px}
+    h1{font-size:22px;margin:0 0 4px}
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
     label{display:block;color:var(--muted);margin-bottom:6px}
     select{
@@ -25,10 +25,20 @@
       appearance:none; border:1px solid var(--line); background:#fff; color:var(--text);
       padding:10px 14px; border-radius:var(--radius); cursor:pointer; transition:all .15s ease;
       height:var(--ctl-h); display:inline-flex; align-items:center; justify-content:center;
+      font-weight:500;
     }
     .btn:hover{border-color:var(--accent-strong);box-shadow:0 0 0 3px rgba(96,165,250,.2)}
     .btn.acc{background:var(--accent);border-color:var(--accent);color:#fff}
     .btn.acc:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+
+    /* ✅ 큰 버튼용 */
+    .btn-lg{
+      height:52px;
+      padding:0 26px;
+      font-size:16px;
+      border-radius:999px;
+    }
+
     .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .hint{color:#64748b;font-size:12px}
     .err{color:#ef4444;font-family:ui-monospace,monospace;white-space:pre-wrap}
@@ -41,7 +51,7 @@
     th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
     th{color:#0f172a;font-weight:600;background:#f1f5f9;position:sticky;top:0}
 
-    .brand{display:flex;align-items:center;gap:14px;margin:0 0 6px}
+    .brand{display:flex;align-items:center;gap:14px;margin:0 0 8px}
     .brand h1{margin:0;font-size:22px}
     .brand-logo{width:var(--logo-size);height:var(--logo-size);flex:0 0 var(--logo-size)}
     .logo-text{
@@ -84,16 +94,67 @@
     .dirlabel::before{content:"📁";margin-right:8px;opacity:.9}
     .dirlabel.connected{display:inline-block;color:var(--accent-strong);font-weight:800}
 
-    .gear-btn{position:fixed;top:16px;right:16px;z-index:50;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;cursor:pointer}
+    .gear-btn{
+      position:fixed;top:16px;right:16px;z-index:50;
+      background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;cursor:pointer;
+      display:none; /* ✅ 기본은 숨김, 입장자 스크린에서만 보이게 */
+    }
+
     .admin-overlay{position:fixed;inset:0;background:rgba(15,23,42,.28);backdrop-filter:saturate(140%) blur(2px);visibility:hidden;opacity:0;pointer-events:none;transition:.15s;z-index:60}
     .admin-overlay.open{visibility:visible;opacity:1;pointer-events:auto}
     .admin-drawer{position:fixed;top:0;right:0;height:100%;width:520px;max-width:92vw;background:#fff;border-left:1px solid var(--line);box-shadow:-8px 0 24px rgba(0,0,0,.08);padding:16px 16px 24px;display:flex;flex-direction:column;gap:12px;z-index:70;transform:translateX(12px);opacity:0;pointer-events:none;transition:transform .15s, opacity .15s}
     .admin-drawer.open{transform:translateX(0);opacity:1;pointer-events:auto}
     .x-btn{appearance:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px 8px;cursor:pointer}
+
+    /* ✅ 기능 버튼 스타일 */
+    .feature-buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+    .feature-btn{
+      border-radius:999px;
+      padding:0 16px;
+      height:40px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:linear-gradient(135deg,#f9fafb,#eff6ff);
+      border:1px solid #dbe3f0;
+      font-size:13px;
+    }
+    .feature-btn:hover{
+      border-color:var(--accent-strong);
+      box-shadow:0 0 0 3px rgba(96,165,250,.18);
+      background:linear-gradient(135deg,#e0edff,#f9fafb);
+    }
+    .feature-btn.primary{
+      background:linear-gradient(135deg,#3b82f6,#60a5fa);
+      border-color:#2563eb;
+      color:#fff;
+      box-shadow:0 10px 20px rgba(37,99,235,.25);
+    }
+    .feature-btn.primary:hover{
+      background:linear-gradient(135deg,#2563eb,#3b82f6);
+      box-shadow:0 12px 24px rgba(37,99,235,.35);
+    }
+    .feature-icon{font-size:16px}
+    .feature-btn[disabled]{
+      opacity:.45;
+      cursor:not-allowed;
+      box-shadow:none;
+      background:#f4f4f5;
+    }
+
+    /* 로그인 카드 약간 히어로 느낌 */
+    #authCard{
+      border-radius:18px;
+      background:linear-gradient(135deg,#eff6ff,#f9fafb);
+      border-color:#dbeafe;
+    }
+    #authCard .row{justify-content:flex-start}
+    #authState{font-size:13px}
+
   </style>
 </head>
 <body>
-  <button id="settingsBtn" class="gear-btn" title="설정" type="button" aria-label="관리자 설정 열기">⚙</button>
+  <button id="settingsBtn" class="gear-btn" title="입장자 체크 관리자 설정" type="button" aria-label="관리자 설정 열기">⚙</button>
 
   <div class="wrap">
     <header class="brand">
@@ -110,10 +171,10 @@
       </div>
     </header>
 
-    <!-- 로그인 카드 (항상 첫 화면에 보이는 영역) -->
+    <!-- 로그인 카드 -->
     <div class="card" id="authCard">
       <div class="row">
-        <button id="gsLoginBtn" class="btn acc" type="button">로그인</button>
+        <button id="gsLoginBtn" class="btn acc btn-lg" type="button">Google 로그인으로 시작하기</button>
         <button id="gsLogoutBtn" class="btn" type="button">로그아웃</button>
         <span id="authState" class="hint">로그인이 필요합니다.</span>
       </div>
@@ -123,22 +184,37 @@
     <!-- 기능 선택 메뉴 (로그인 후에만 표시) -->
     <div class="card" id="featureMenuCard" style="display:none">
       <label>기능 선택</label>
-      <div class="row" style="margin-top:4px">
-        <button id="featureBtnEntrant" class="btn acc" type="button">입장자 체크</button>
-        <button id="featureBtnChatbot" class="btn" type="button" disabled>챗봇 데이터 (준비중)</button>
-        <button id="featureBtnSales" class="btn" type="button" disabled>세일즈 멘트 GPTs (준비중)</button>
-        <button id="featureBtnDrive" class="btn" type="button" disabled>드라이브 링크 모음 (준비중)</button>
-        <button id="featureBtnCsv" class="btn" type="button" disabled>결제자 CSV 정리 (준비중)</button>
+      <div class="feature-buttons">
+        <button id="featureBtnEntrant" class="btn feature-btn primary" type="button">
+          <span class="feature-icon">👥</span>
+          <span>카톡 입장자 체크</span>
+        </button>
+        <button id="featureBtnChatbot" class="btn feature-btn" type="button" disabled>
+          <span class="feature-icon">🤖</span>
+          <span>챗봇 데이터 (준비중)</span>
+        </button>
+        <button id="featureBtnSales" class="btn feature-btn" type="button" disabled>
+          <span class="feature-icon">💬</span>
+          <span>세일즈 멘트 GPTs (준비중)</span>
+        </button>
+        <button id="featureBtnDrive" class="btn feature-btn" type="button" disabled>
+          <span class="feature-icon">📂</span>
+          <span>드라이브 링크 모음 (준비중)</span>
+        </button>
+        <button id="featureBtnCsv" class="btn feature-btn" type="button" disabled>
+          <span class="feature-icon">📊</span>
+          <span>결제자 CSV 정리 (준비중)</span>
+        </button>
       </div>
       <div class="hint" style="margin-top:6px">
         Google 로그인 후 사용하고 싶은 기능 버튼을 눌러주세요.  
-        (지금은 <strong>입장자 체크</strong>만 연결되어 있고, 나머지는 이후 코드 받으면 연결할 예정)
+        (지금은 <strong>카톡 입장자 체크</strong>만 연결되어 있고, 나머지는 이후 코드 받으면 붙일 예정입니다.)
       </div>
     </div>
 
     <!-- 기능별 섹션 컨테이너 -->
     <div id="featureContainer">
-      <!-- 입장자 체크 섹션: 기존 Panel A/B 전체를 그대로 감쌈 -->
+      <!-- ✅ 입장자 체크 섹션 -->
       <section id="featureEntrant" data-feature-section="entrant" style="display:none">
         <div class="panels">
           <!-- Panel A -->
@@ -247,29 +323,18 @@
         </div>
       </section>
 
-      <!-- 이후 코드 붙일 자리들: 지금은 비어 있고 숨겨둠 -->
-      <section id="featureChatbot" data-feature-section="chatbot" style="display:none">
-        <!-- 메신저봇R / 챗봇 데이터용 UI 여기 들어갈 예정 -->
-      </section>
-
-      <section id="featureSales" data-feature-section="sales" style="display:none">
-        <!-- 세일즈 멘트 GPTs UI 여기 들어갈 예정 -->
-      </section>
-
-      <section id="featureDrive" data-feature-section="drive" style="display:none">
-        <!-- 드라이브 폴더 링크 모음 UI 여기 들어갈 예정 -->
-      </section>
-
-      <section id="featureCsv" data-feature-section="csv" style="display:none">
-        <!-- 결제자 CSV 정리 UI 여기 들어갈 예정 -->
-      </section>
+      <!-- 나중에 붙일 자리들 (지금은 숨김) -->
+      <section id="featureChatbot" data-feature-section="chatbot" style="display:none"></section>
+      <section id="featureSales" data-feature-section="sales" style="display:none"></section>
+      <section id="featureDrive" data-feature-section="drive" style="display:none"></section>
+      <section id="featureCsv" data-feature-section="csv" style="display:none"></section>
     </div>
   </div>
 
   <div id="adminOverlay" class="admin-overlay" aria-hidden="true"></div>
   <aside id="adminDrawer" class="admin-drawer" aria-hidden="true">
     <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
-      <h3 style="margin:0">관리자 설정</h3>
+      <h3 style="margin:0">입장자 체크 · 관리자 설정</h3>
       <button id="closeAdmin" class="x-btn" type="button">닫기</button>
     </div>
 
@@ -348,21 +413,34 @@ const CLIENT_ID="18228268359-iifm4ck3j9kqj74eh1p90tco1k2mbpi0.apps.googleusercon
 /* ===== OAuth ===== */
 let accessToken=null,tokenClient=null;
 
+/* ✅ 관리자(⚙) 노출 제어: 카톡 입장자 스크린에서만 */
+function updateAdminVisibility(featureKey){
+  const gear=$$('settingsBtn');
+  if(!gear)return;
+  if(featureKey==='entrant'){
+    gear.style.display='block';
+  }else{
+    gear.style.display='none';
+  }
+}
+
 function setFeatureVisibility(isLoggedIn){
   const menuCard=$$('featureMenuCard');
   if(menuCard) menuCard.style.display=isLoggedIn?'block':'none';
   if(!isLoggedIn){
-    // 모든 기능 섹션 숨기기
     document.querySelectorAll('[data-feature-section]').forEach(sec=>{
       sec.style.display='none';
     });
+    updateAdminVisibility(null);
   }
 }
 
+/* ✅ 스크린 전환 (가짜 페이지) */
 function showFeatureSection(key){
   document.querySelectorAll('[data-feature-section]').forEach(sec=>{
     sec.style.display = (sec.dataset.featureSection===key)?'block':'none';
   });
+  updateAdminVisibility(key);
 }
 
 function initAuth(){
@@ -377,6 +455,8 @@ function initAuth(){
         txt('authState','로그인 완료');
         txt('authErr','');
         setFeatureVisibility(true);
+        // 첫 로그인 시 기본으로 입장자 체크 스크린 열어주고 싶으면 아래 주석 해제:
+        // showFeatureSection('entrant');
       },
       error_callback:err=>{
         txt('authErr','OAuth 오류: '+(err?.error||err?.type||JSON.stringify(err)));
@@ -588,7 +668,6 @@ async function readSelectedTxt(sfx){
 
   const raw=await res.text();
 
-  // csv면 C열(3번째 열)만 줄 단위로 추출
   if(info.name.toLowerCase().endsWith('.csv')){
     const lines=raw.split(/\r?\n/);
     const colC=[];
@@ -606,7 +685,6 @@ async function readSelectedTxt(sfx){
     return colC.join('\n');
   }
 
-  // txt는 그대로
   return raw;
 }
 
@@ -958,7 +1036,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   on('gsLoginBtn','click',requestAccess);
   on('gsLogoutBtn','click',revokeAccess);
 
-  // 기능 버튼: 일단 입장자 체크만 활성
+  // 기능 버튼: 현재는 입장자 체크만 활성
   const btnEntrant=$$('featureBtnEntrant');
   if(btnEntrant){
     btnEntrant.addEventListener('click',()=>{
@@ -997,7 +1075,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   refreshDriveList('A');
   refreshDriveList('B');
 
-  // 처음엔 기능 섹션 모두 숨김
+  // 초기 상태: 로그인 전이니까 기능/⚙ 숨김
   setFeatureVisibility(false);
 });
 </script>
