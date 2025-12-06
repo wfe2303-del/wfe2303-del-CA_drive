@@ -7,14 +7,14 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root{
-      --bg:#fff; --card:#fff; --surface:#f8fafc; --line:#e5e7eb; --text:#0f172a; --muted:#64748b;
+      --bg:#f1f5f9; --card:#fff; --surface:#f8fafc; --line:#e5e7eb; --text:#0f172a; --muted:#64748b;
       --accent:#60a5fa; --accent-strong:#3b82f6; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
       --radius:12px; --ctl-h:42px; --gap:12px; --logo-size:112px;
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
     .wrap{max-width:1200px;margin:28px auto;padding:0 16px}
-    h1{font-size:22px;margin:0 0 4px}
+    h1{font-size:22px;margin:0 0 8px}
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
     label{display:block;color:var(--muted);margin-bottom:6px}
     select{
@@ -25,28 +25,16 @@
       appearance:none; border:1px solid var(--line); background:#fff; color:var(--text);
       padding:10px 14px; border-radius:var(--radius); cursor:pointer; transition:all .15s ease;
       height:var(--ctl-h); display:inline-flex; align-items:center; justify-content:center;
-      font-weight:500;
+      font-weight:600;
     }
     .btn:hover{border-color:var(--accent-strong);box-shadow:0 0 0 3px rgba(96,165,250,.2)}
     .btn.acc{background:var(--accent);border-color:var(--accent);color:#fff}
     .btn.acc:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
-    .btn-sm{
-      height:30px;
-      padding:0 10px;
-      border-radius:999px;
-      font-size:12px;
-    }
-    .btn-lg{
-      height:52px;
-      padding:0 26px;
-      font-size:16px;
-      border-radius:999px;
-    }
     .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .hint{color:#64748b;font-size:12px}
     .err{color:#ef4444;font-family:ui-monospace,monospace;white-space:pre-wrap}
 
-    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:#fff}
+    .pill{display:inline-flex;gap:6px;align-items:center;padding:4px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:#fff;font-size:12px}
     .pill.ok{border-color:rgba(34,197,94,.25);color:var(--ok)}
     .pill.warn{border-color:rgba(245,158,11,.25);color:var(--warn)}
     .pill.bad{border-color:rgba(239,68,68,.25);color:var(--bad)}
@@ -54,7 +42,7 @@
     th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
     th{color:#0f172a;font-weight:600;background:#f1f5f9;position:sticky;top:0}
 
-    .brand{display:flex;align-items:center;gap:14px;margin:0 0 8px}
+    .brand{display:flex;align-items:center;gap:14px;margin:0 0 12px}
     .brand h1{margin:0;font-size:22px}
     .brand-logo{width:var(--logo-size);height:var(--logo-size);flex:0 0 var(--logo-size)}
     .logo-text{
@@ -63,20 +51,20 @@
       paint-order:stroke fill; stroke:#0f172a; stroke-width:.9px;
     }
 
-    .brand-sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .gear-btn{
+      position:fixed;top:16px;right:16px;z-index:50;background:#fff;border:1px solid var(--line);
+      border-radius:12px;padding:8px;cursor:pointer;display:none;
+    }
+    .admin-overlay{position:fixed;inset:0;background:rgba(15,23,42,.28);backdrop-filter:saturate(140%) blur(2px);visibility:hidden;opacity:0;pointer-events:none;transition:.15s;z-index:60}
+    .admin-overlay.open{visibility:visible;opacity:1;pointer-events:auto}
+    .admin-drawer{position:fixed;top:0;right:0;height:100%;width:520px;max-width:92vw;background:#fff;border-left:1px solid var(--line);box-shadow:-8px 0 24px rgba(0,0,0,.08);padding:16px 16px 24px;display:flex;flex-direction:column;gap:12px;z-index:70;transform:translateX(12px);opacity:0;pointer-events:none;transition:transform .15s, opacity .15s}
+    .admin-drawer.open{transform:translateX(0);opacity:1;pointer-events:auto}
+    .x-btn{appearance:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px 8px;cursor:pointer}
 
-    .admin-drawer{width:520px;padding:14px 16px 18px}
     .admin-drawer .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:none;margin:0 0 12px}
     .admin-drawer h4{margin:0 0 8px;font-weight:700}
     .admin-drawer label{color:#64748b;font-size:13px;margin:6px 0 4px}
-    .admin-drawer input, .input{
-      height:42px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;
-      width:100%;outline:none;font:14px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    }
-    .input:focus, .admin-drawer input:focus{
-      border-color:var(--accent-strong);
-      box-shadow:0 0 0 3px rgba(96,165,250,.3);
-    }
+    .admin-drawer input{height:42px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
     .admin-drawer .btn{height:36px;padding:0 12px;border-radius:12px}
     #admList{border-collapse:collapse;width:100%}
     #admMeta{color:#94a3b8;margin-top:8px}
@@ -104,94 +92,65 @@
     .dirlabel::before{content:"📁";margin-right:8px;opacity:.9}
     .dirlabel.connected{display:inline-block;color:var(--accent-strong);font-weight:800}
 
-    .gear-btn{
-      position:fixed;top:16px;right:16px;z-index:50;
-      background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;cursor:pointer;
-      display:none;
-    }
+    /* 화면 스크린 */
+    .screen{display:none;margin-top:16px}
+    .screen.active{display:block}
 
-    .admin-overlay{position:fixed;inset:0;background:rgba(15,23,42,.28);backdrop-filter:saturate(140%) blur(2px);visibility:hidden;opacity:0;pointer-events:none;transition:.15s;z-index:60}
-    .admin-overlay.open{visibility:visible;opacity:1;pointer-events:auto}
-    .admin-drawer{position:fixed;top:0;right:0;height:100%;width:520px;max-width:92vw;background:#fff;border-left:1px solid var(--line);box-shadow:-8px 0 24px rgba(0,0,0,.08);padding:16px 16px 24px;display:flex;flex-direction:column;gap:12px;z-index:70;transform:translateX(12px);opacity:0;pointer-events:none;transition:transform .15s, opacity .15s}
-    .admin-drawer.open{transform:translateX(0);opacity:1;pointer-events:auto}
-    .x-btn{appearance:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px 8px;cursor:pointer}
-
-    .feature-buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
-    .feature-btn{
-      border-radius:999px;
-      padding:0 16px;
-      height:40px;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      background:linear-gradient(135deg,#f9fafb,#eff6ff);
-      border:1px solid #dbe3f0;
-      font-size:13px;
-      cursor:pointer;
+    .menu-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+      gap:16px;
+      margin-top:8px;
     }
-    .feature-btn:hover{
-      border-color:var(--accent-strong);
-      box-shadow:0 0 0 3px rgba(96,165,250,.18);
-      background:linear-gradient(135deg,#e0edff,#f9fafb);
-    }
-    .feature-btn.primary{
-      background:linear-gradient(135deg,#3b82f6,#60a5fa);
-      border-color:#2563eb;
-      color:#fff;
-      box-shadow:0 10px 20px rgba(37,99,235,.25);
-    }
-    .feature-btn.primary:hover{
-      background:linear-gradient(135deg,#2563eb,#3b82f6);
-      box-shadow:0 12px 24px rgba(37,99,235,.35);
-    }
-    .feature-icon{font-size:16px}
-    .feature-btn[disabled]{
-      opacity:.45;
-      cursor:not-allowed;
-      box-shadow:none;
-      background:#f4f4f5;
-    }
-
-    #authCard{
-      border-radius:18px;
-      background:linear-gradient(135deg,#eff6ff,#f9fafb);
-      border-color:#dbeafe;
-    }
-
-    /* 세일즈 멘트 영역 */
-    .sales-layout{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
-    .sales-left{flex:1;min-width:280px}
-    .sales-right{flex:2;min-width:340px}
-    .sales-card{border-radius:14px;border:1px solid var(--line);padding:12px 14px;background:#fff}
-    .sales-meta{font-size:12px;color:#94a3b8;margin-top:4px}
-
-    /* 드라이브 링크 카드 */
-    .drive-card{
-      position:relative;
-      width:220px;
-      padding:14px 14px 12px;
-      border-radius:14px;
+    .menu-btn{
+      width:100%;
+      height:80px;
+      border-radius:16px;
       border:1px solid var(--line);
-      background:linear-gradient(135deg,#f8fafc,#eef2ff);
-      cursor:pointer;
+      background:#fff;
       display:flex;
       flex-direction:column;
+      justify-content:center;
+      align-items:flex-start;
+      padding:16px 18px;
       gap:4px;
+      cursor:pointer;
+      transition:all .15s ease;
     }
-    .drive-card-title{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .drive-card-id{font-size:11px;color:#94a3b8}
-    .drive-card .badge{
-      font-size:11px;
-      padding:2px 8px;
-      border-radius:999px;
-      background:rgba(37,99,235,.08);
-      color:#1d4ed8;
-      align-self:flex-start;
+    .menu-btn span.title{font-weight:700;font-size:15px}
+    .menu-btn span.sub{font-size:12px;color:var(--muted)}
+    .menu-btn:hover{border-color:var(--accent-strong);box-shadow:0 8px 18px rgba(15,23,42,.08);transform:translateY(-1px)}
+    .menu-section-title{font-size:15px;font-weight:700;margin:0 0 4px}
+    .menu-section-hint{font-size:12px;color:var(--muted);margin:0 0 8px}
+
+    .back-btn{margin-bottom:10px}
+
+    /* GPTs 탭 */
+    .gpts-layout{display:grid;gap:16px}
+    @media(min-width:960px){
+      .gpts-layout{grid-template-columns:minmax(0,1.1fr) minmax(0,1.2fr);}
     }
+    textarea{
+      width:100%;min-height:140px;border-radius:12px;border:1px solid var(--line);
+      padding:10px 12px;resize:vertical;font-family:inherit;font-size:14px;
+    }
+    .gpts-item-title{font-weight:600;margin-bottom:4px}
+    .gpts-item-meta{font-size:11px;color:var(--muted);margin-bottom:8px}
+    .gpts-item-text{white-space:pre-wrap;font-size:13px}
+    .gpts-item-actions{display:flex;gap:8px;margin-top:8px}
+
+    /* 드라이브 링크 카드 */
+    .drive-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+    .drive-card{border:1px solid var(--line);border-radius:16px;padding:14px 16px;background:#fff;display:flex;flex-direction:column;gap:6px}
+    .drive-title{font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px}
+    .drive-title::before{content:"📁";font-size:16px}
+    .drive-label{font-size:11px;color:var(--accent-strong);font-weight:700}
+    .drive-link{font-size:11px;color:var(--muted);word-break:break-all;margin-top:4px}
   </style>
 </head>
 <body>
-  <button id="settingsBtn" class="gear-btn" title="입장자 체크 관리자 설정" type="button" aria-label="관리자 설정 열기">⚙</button>
+  <!-- 관리자 설정(카톡 입장자 스크린에서만 노출) -->
+  <button id="settingsBtn" class="gear-btn" title="스프레드시트 설정" type="button" aria-label="관리자 설정 열기">⚙</button>
 
   <div class="wrap">
     <header class="brand">
@@ -202,88 +161,87 @@
         <text x="8" y="24" class="logo-text">Class</text>
         <text x="8" y="42" class="logo-text">Around</text>
       </svg>
-      <div>
-        <h1>클래스어라운드 운영봇</h1>
-        <div class="brand-sub">카카오톡 입장자 체크 · 챗봇 데이터 · 세일즈 멘트 · 드라이브 · 결제자 CSV</div>
-      </div>
+      <h1>클래스어라운드 운영봇 대시보드</h1>
     </header>
 
-    <!-- 로그인 카드 -->
-    <div class="card" id="authCard">
-      <div class="row">
-        <button id="gsLoginBtn" class="btn acc btn-lg" type="button">Google 로그인으로 시작하기</button>
-        <button id="gsLogoutBtn" class="btn" type="button">로그아웃</button>
-        <span id="authState" class="hint">로그인이 필요합니다.</span>
+    <!-- 로그인 스크린 -->
+    <section id="screen-login" class="screen active">
+      <div class="card">
+        <h2 style="margin:0 0 8px;font-size:18px">Google 계정으로 연결</h2>
+        <p class="hint" style="margin:0 0 12px">
+          스프레드시트 / 드라이브 연동을 위해 먼저 Google 로그인을 해주세요.
+        </p>
+        <div class="row">
+          <button id="gsLoginBtn" class="btn acc" type="button" style="font-size:15px;padding:12px 22px;height:48px">
+            Google 로그인
+          </button>
+          <button id="gsLogoutBtn" class="btn" type="button">로그아웃</button>
+          <span id="authState" class="hint">로그인이 필요합니다.</span>
+        </div>
+        <div id="authErr" class="err" style="margin-top:6px"></div>
       </div>
-      <div id="authErr" class="err" style="margin-top:6px"></div>
-    </div>
+      <div class="card">
+        <p class="hint" style="margin:0">
+          로그인 후 <b>운영 기능</b>들을 한 곳에서 사용할 수 있습니다.<br/>
+          · 카톡 입장자 체크<br/>
+          · GPTs 세일즈 멘트 정리<br/>
+          · 자주 쓰는 드라이브 폴더 모음
+        </p>
+      </div>
+    </section>
 
-    <!-- 기능 선택 메뉴 -->
-    <div class="card" id="featureMenuCard">
-      <label>기능 선택</label>
-      <div class="feature-buttons">
-        <button id="featureBtnEntrant" class="btn feature-btn primary" type="button">
-          <span class="feature-icon">👥</span>
-          <span>카톡 입장자 체크</span>
-        </button>
-        <button id="featureBtnChatbot" class="btn feature-btn" type="button" disabled>
-          <span class="feature-icon">🤖</span>
-          <span>챗봇 데이터 (준비중)</span>
-        </button>
-        <button id="featureBtnSales" class="btn feature-btn" type="button">
-          <span class="feature-icon">💬</span>
-          <span>세일즈 멘트 GPTs</span>
-        </button>
-        <button id="featureBtnDrive" class="btn feature-btn" type="button">
-          <span class="feature-icon">📂</span>
-          <span>드라이브 폴더 모음</span>
-        </button>
-        <button id="featureBtnCsv" class="btn feature-btn" type="button" disabled>
-          <span class="feature-icon">📊</span>
-          <span>결제자 CSV 정리 (준비중)</span>
-        </button>
+    <!-- 메인 메뉴 스크린 -->
+    <section id="screen-menu" class="screen">
+      <div class="card">
+        <h2 class="menu-section-title">운영 기능 선택</h2>
+        <p class="menu-section-hint">
+          한 번 로그인하면, 아래 기능들을 자유롭게 오가면서 사용할 수 있어요.
+        </p>
+        <div class="menu-grid">
+          <button id="toolBtnKakao" class="menu-btn" type="button">
+            <span class="title">카톡 입장자 체크</span>
+            <span class="sub">오픈채팅 입장/퇴장 로그를 기반으로 수강생 입장 여부 자동 표시</span>
+          </button>
+          <button id="toolBtnGPTS" class="menu-btn" type="button">
+            <span class="title">GPTs 세일즈 멘트 정리</span>
+            <span class="sub">GPT API로 멘트를 생성하고, 카드 단위로 저장/복사/편집</span>
+          </button>
+          <button id="toolBtnDrive" class="menu-btn" type="button">
+            <span class="title">드라이브 폴더 모음</span>
+            <span class="sub">자주 쓰는 강의 폴더들을 카드로 모아서 바로바로 열기</span>
+          </button>
+        </div>
       </div>
-      <div class="hint" style="margin-top:6px">
-        기능은 로그인 여부와 상관없이 눌러볼 수 있고, 실사용 시에는 Google 로그인이 필요합니다.
-      </div>
-    </div>
+    </section>
 
-    <!-- 기능별 섹션 -->
-    <div id="featureContainer">
-      <!-- ✅ 입장자 체크 -->
-      <section id="featureEntrant" data-feature-section="entrant">
-        <div class="panels">
-          <!-- Panel A -->
-          <section>
-            <div class="card">
-              <div class="controls">
-                <div class="controls-line">
-                  <div>
-                    <label>시트 선택</label>
-                    <select id="sheetPackSelectA"></select>
-                  </div>
-                  <div>
-                    <label>읽기 시트 선택</label>
-                    <select id="readSheetSelectA"></select>
-                  </div>
-                  <div>
-                    <label style="visibility:hidden">refresh</label>
-                    <button id="refreshMetaA" class="icon-btn" type="button">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/>
-                      </svg>
-                    </button>
-                  </div>
+    <!-- 카톡 입장자 체크 스크린 -->
+    <section id="screen-kakao" class="screen">
+      <button id="backFromKakao" class="btn back-btn" type="button">← 메인으로</button>
+      <div class="card" style="margin-bottom:18px">
+        <h2 style="margin:0 0 4px;font-size:16px">카카오톡 입장자 체크봇</h2>
+        <p class="hint" style="margin:0">
+          · Panel A/B로 서로 다른 시트/방을 동시에 관리할 수 있습니다.<br/>
+          · 상단 ⚙ 버튼에서 스프레드시트를 등록한 뒤 사용해주세요.
+        </p>
+      </div>
+
+      <div class="panels">
+        <!-- Panel A -->
+        <section>
+          <div class="card">
+            <div class="controls">
+              <div class="controls-line">
+                <div>
+                  <label>시트 선택</label>
+                  <select id="sheetPackSelectA"></select>
                 </div>
-
-                <div class="hint" style="margin-top:-4px"></div>
-
-                <label style="margin-top:8px"></label>
-                <div class="dirline">
-                  <button id="dirPickA" class="btn" type="button">폴더</button>
-                  <div class="dirlabel connected" id="dirNameA"></div>
-                  <select id="dirFileSelectA"></select>
-                  <button id="dirRefreshA" class="icon-btn" type="button">
+                <div>
+                  <label>읽기 시트 선택</label>
+                  <select id="readSheetSelectA"></select>
+                </div>
+                <div>
+                  <label style="visibility:hidden">refresh</label>
+                  <button id="refreshMetaA" class="icon-btn" type="button">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/>
                     </svg>
@@ -291,51 +249,51 @@
                 </div>
               </div>
 
-              <div class="row" style="margin-top:10px">
-                <label class="row" style="gap:6px;align-items:center">
-                  <input id="previewOnlyA" type="checkbox" />
-                  <span class="hint">열람용</span>
-                </label>
-                <button id="runBtnA" class="btn acc" type="button">실행</button>
-                <button id="demoBtnA" class="btn" type="button">데모</button>
-                <span id="pillsAA" class="row"></span>
+              <div class="hint" style="margin-top:-4px">기본 드라이브 폴더는 입장자 로그 폴더로 자동 연결됩니다.</div>
+
+              <label style="margin-top:8px">입장 로그 txt/csv 파일 선택</label>
+              <div class="dirline">
+                <button id="dirPickA" class="btn" type="button">폴더 변경</button>
+                <div class="dirlabel" id="dirNameA"></div>
+                <select id="dirFileSelectA"></select>
+                <button id="dirRefreshA" class="icon-btn" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/>
+                  </svg>
+                </button>
               </div>
-              <div id="errA" class="err" style="margin-top:8px"></div>
             </div>
-            <div id="resultsA" style="display:grid;gap:16px"></div>
-          </section>
 
-          <!-- Panel B -->
-          <section>
-            <div class="card">
-              <div class="controls">
-                <div class="controls-line">
-                  <div>
-                    <label>시트 선택</label>
-                    <select id="sheetPackSelectB"></select>
-                  </div>
-                  <div>
-                    <label>읽기 시트 선택</label>
-                    <select id="readSheetSelectB"></select>
-                  </div>
-                  <div>
-                    <label style="visibility:hidden">refresh</label>
-                    <button id="refreshMetaB" class="icon-btn" type="button">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/>
-                      </svg>
-                    </button>
-                  </div>
+            <div class="row" style="margin-top:10px">
+              <label class="row" style="gap:6px;align-items:center">
+                <input id="previewOnlyA" type="checkbox" />
+                <span class="hint">열람용(실제 시트 업데이트 X)</span>
+              </label>
+              <button id="runBtnA" class="btn acc" type="button">실행</button>
+              <button id="demoBtnA" class="btn" type="button">데모</button>
+              <span id="pillsAA" class="row"></span>
+            </div>
+            <div id="errA" class="err" style="margin-top:8px"></div>
+          </div>
+          <div id="resultsA" style="display:grid;gap:16px"></div>
+        </section>
+
+        <!-- Panel B -->
+        <section>
+          <div class="card">
+            <div class="controls">
+              <div class="controls-line">
+                <div>
+                  <label>시트 선택</label>
+                  <select id="sheetPackSelectB"></select>
                 </div>
-
-                <div class="hint" style="margin-top:-4px"></div>
-
-                <label style="margin-top:8px"></label>
-                <div class="dirline">
-                  <button id="dirPickB" class="btn" type="button">폴더</button>
-                  <div class="dirlabel connected" id="dirNameB"></div>
-                  <select id="dirFileSelectB"></select>
-                  <button id="dirRefreshB" class="icon-btn" type="button">
+                <div>
+                  <label>읽기 시트 선택</label>
+                  <select id="readSheetSelectB"></select>
+                </div>
+                <div>
+                  <label style="visibility:hidden">refresh</label>
+                  <button id="refreshMetaB" class="icon-btn" type="button">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/>
                     </svg>
@@ -343,100 +301,86 @@
                 </div>
               </div>
 
-              <div class="row" style="margin-top:10px">
-                <label class="row" style="gap:6px;align-items:center">
-                  <input id="previewOnlyB" type="checkbox" />
-                  <span class="hint">열람용</span>
-                </label>
-                <button id="runBtnB" class="btn acc" type="button">실행</button>
-                <button id="demoBtnB" class="btn" type="button">데모</button>
-                <span id="pillsBB" class="row"></span>
-              </div>
-              <div id="errB" class="err" style="margin-top:8px"></div>
-            </div>
-            <div id="resultsB" style="display:grid;gap:16px"></div>
-          </section>
-        </div>
-      </section>
+              <div class="hint" style="margin-top:-4px">필요 시 두 번째 방/시트용으로 사용하세요.</div>
 
-      <!-- ✅ 세일즈 멘트 GPTs -->
-      <section id="featureSales" data-feature-section="sales" style="display:none">
+              <label style="margin-top:8px">입장 로그 txt/csv 파일 선택</label>
+              <div class="dirline">
+                <button id="dirPickB" class="btn" type="button">폴더 변경</button>
+                <div class="dirlabel" id="dirNameB"></div>
+                <select id="dirFileSelectB"></select>
+                <button id="dirRefreshB" class="icon-btn" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="row" style="margin-top:10px">
+              <label class="row" style="gap:6px;align-items:center">
+                <input id="previewOnlyB" type="checkbox" />
+                <span class="hint">열람용(실제 시트 업데이트 X)</span>
+              </label>
+              <button id="runBtnB" class="btn acc" type="button">실행</button>
+              <button id="demoBtnB" class="btn" type="button">데모</button>
+              <span id="pillsBB" class="row"></span>
+            </div>
+            <div id="errB" class="err" style="margin-top:8px"></div>
+          </div>
+          <div id="resultsB" style="display:grid;gap:16px"></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- GPTs 세일즈 멘트 스크린 -->
+    <section id="screen-gpts" class="screen">
+      <button id="backFromGPTS" class="btn back-btn" type="button">← 메인으로</button>
+      <div class="gpts-layout">
         <div class="card">
-          <h2 style="margin-top:0;margin-bottom:8px">세일즈 멘트 자동 생성 (GPTs)</h2>
-          <div class="hint" style="margin-bottom:12px">
-            타깃과 멘트 종류를 선택하면 GPT로부터 멘트를 받아옵니다. (백엔드 Apps Script 필요)
+          <h2 style="margin:0 0 8px;font-size:16px">GPTs 세일즈 멘트 생성</h2>
+          <p class="hint" style="margin:0 0 10px">
+            광고/라이브 대본, 세일즈 멘트 요약본 등을 입력하면 GPT API를 통해 멘트를 생성합니다.<br/>
+            생성된 멘트는 우측에서 카드 단위로 저장/복사/편집할 수 있어요.
+          </p>
+          <label>멘트 제목(선택)</label>
+          <input id="gptsTitle" type="text" placeholder="예: 4050 시니어쇼츠 무료강의 시작 멘트" style="width:100%;height:40px;border-radius:12px;border:1px solid var(--line);padding:8px 10px;margin-bottom:8px"/>
+          <label>프롬프트 / 대본 내용</label>
+          <textarea id="gptsPrompt" placeholder="여기에 광고 대본, 컨셉, 타깃 정보 등을 적어주세요.&#10;예) 40~50대 직장인/주부 대상으로, '월 30만 원 부업 수익' 메시지를 강조한 인트로 멘트를 3개 만들어줘."></textarea>
+          <div class="row" style="margin-top:10px">
+            <button id="gptsGenerateBtn" class="btn acc" type="button">멘트 생성</button>
+            <span id="gptsStatus" class="hint"></span>
           </div>
-
-          <div class="sales-layout">
-            <!-- 좌측: 설정 -->
-            <div class="sales-left">
-              <label>타깃</label>
-              <input id="salesTarget" class="input" placeholder="예: 40~50대 주부 / 직장인">
-
-              <label style="margin-top:10px">멘트 종류</label>
-              <select id="salesType">
-                <option value="start">무료강의 시작 멘트</option>
-                <option value="entry">입장 유도 멘트</option>
-                <option value="payment">본강의 결제 유도 멘트</option>
-                <option value="closing">마무리 멘트</option>
-              </select>
-
-              <label style="margin-top:10px">멘트 개수</label>
-              <input id="salesCount" class="input" type="number" min="1" max="20" value="5">
-
-              <label style="margin-top:10px">추가 설명(선택)</label>
-              <textarea id="salesNotes" class="input" rows="3" style="resize:vertical"
-                placeholder="예: 쿠팡 쇼핑숏츠 강의, 영끌남 크루, 부담감 줄이는 톤 등"></textarea>
-
-              <button id="salesGenBtn" class="btn acc" style="margin-top:14px">멘트 생성</button>
-              <div id="salesErr" class="err" style="margin-top:6px"></div>
-            </div>
-
-            <!-- 우측: 생성 결과 + 저장된 멘트 -->
-            <div class="sales-right">
-              <div class="sales-card">
-                <div class="row" style="justify-content:space-between;align-items:center">
-                  <h3 style="margin:0;font-size:15px">생성된 멘트</h3>
-                  <span class="sales-meta" id="salesGenMeta"></span>
-                </div>
-                <div id="salesResults" style="display:grid;gap:8px;margin-top:8px"></div>
-              </div>
-
-              <div class="sales-card" style="margin-top:10px">
-                <div class="row" style="justify-content:space-between;align-items:center">
-                  <h3 style="margin:0;font-size:15px">저장된 멘트</h3>
-                  <button id="salesClearSaved" class="btn btn-sm">전체 삭제</button>
-                </div>
-                <div class="sales-meta">로컬에만 저장됩니다.(이 브라우저에서만)</div>
-                <div id="salesSavedList" style="display:grid;gap:8px;margin-top:8px"></div>
-              </div>
-            </div>
-          </div>
+          <div id="gptsError" class="err" style="margin-top:8px"></div>
         </div>
-      </section>
-
-      <!-- ✅ 드라이브 폴더 링크 모음 (코드 내 고정 목록) -->
-      <section id="featureDrive" data-feature-section="drive" style="display:none">
-        <div class="card">
-          <h2 style="margin-top:0;margin-bottom:8px">드라이브 폴더 모음</h2>
-          <div class="hint" style="margin-bottom:10px">
-            코드 안에 미리 등록해둔 드라이브 폴더 목록입니다. 폴더 카드를 클릭하면 새 탭에서 열립니다.
-          </div>
-          <div id="driveFolderList" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px"></div>
+        <div class="card" style="max-height:520px;overflow:auto">
+          <h3 style="margin:0 0 6px;font-size:15px">저장된 멘트</h3>
+          <p class="hint" style="margin:0 0 8px">
+            카드별로 복사/삭제/편집 가능합니다. (브라우저 localStorage에 저장)
+          </p>
+          <div id="gptsList"></div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- 챗봇/CSV는 자리만 -->
-      <section id="featureChatbot" data-feature-section="chatbot" style="display:none"></section>
-      <section id="featureCsv" data-feature-section="csv" style="display:none"></section>
-    </div>
+    <!-- 드라이브 폴더 모음 스크린 -->
+    <section id="screen-drive" class="screen">
+      <button id="backFromDrive" class="btn back-btn" type="button">← 메인으로</button>
+      <div class="card">
+        <h2 style="margin:0 0 6px;font-size:16px">자주 쓰는 드라이브 폴더 모음</h2>
+        <p class="hint" style="margin:0 0 12px">
+          코드 내부 <b>DRIVE_LINKS</b> 배열에 등록된 폴더만 여기 카드로 표시됩니다.<br/>
+          강의별 원본 영상, 썸네일 자료, 결제 내역 시트 등을 모아두고 바로 접근할 수 있어요.
+        </p>
+        <div id="driveCards" class="drive-grid"></div>
+      </div>
+    </section>
   </div>
 
-  <!-- 관리자 패널 (입장자 체크 전용) -->
+  <!-- 관리자 드로어 (카톡 입장자 전용 설정) -->
   <div id="adminOverlay" class="admin-overlay" aria-hidden="true"></div>
   <aside id="adminDrawer" class="admin-drawer" aria-hidden="true">
     <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
-      <h3 style="margin:0">입장자 체크 · 관리자 설정</h3>
+      <h3 style="margin:0">스프레드시트 연결 설정</h3>
       <button id="closeAdmin" class="x-btn" type="button">닫기</button>
     </div>
 
@@ -466,6 +410,9 @@
   </aside>
 
 <script>
+/* =========================
+   공통 유틸 / 상수
+========================= */
 const PANEL_SUFFIXES=['A','B'];
 const $$=id=>document.getElementById(id);
 const byPanel=(base,s)=>$$(base+s);
@@ -476,47 +423,24 @@ function on(id,ev,fn,sfx){
   if(!el){console.warn('bind skip',id,sfx);return;}
   el.addEventListener(ev,e=>{try{fn(e);}catch(err){console.error(err);}});
 }
-function show(el){el.classList.add('open');el.setAttribute('aria-hidden','false');}
-function hide(el){el.classList.remove('open');el.setAttribute('aria-hidden','true');}
-function digitsOnly(s){return String(s||'').replace(/[^\d]/g,'');}
-function last4Digits(s){const d=digitsOnly(s);return d.slice(-4);}
-function normalizeName(n){
-  let s=String(n||'').trim();
-  s=s.replace(/[\s]*[\(\[\{（【][^)\]\}）】]*[\)\]\}）】]\s*$/,'');
-  s=s.replace(/[/_\-\s]+$/,'');
-  s=s.replace(/\s+/g,' ');
-  return s;
-}
-const earlierId=(a,b)=>{const ai=parseInt(a,10),bi=parseInt(b,10);if(!Number.isNaN(ai)&&!Number.isNaN(bi))return ai<=bi?a:b;return(String(a)<=String(b))?a:b;};
 
-(function(){
-  const pushErr=(msg,src,l,c,e)=>{
-    const details=(e&&e.stack)?'\n'+e.stack:'';
-    PANEL_SUFFIXES.forEach(s=>{
-      const el=$$('#err'+s);
-      if(el)el.textContent='오류: '+msg+(src?`\n${src}:${l}:${c}`:'')+details;
-    });
-  };
-  window.addEventListener('error',e=>pushErr(e.message,e.filename,e.lineno,e.colno,e.error));
-  window.addEventListener('unhandledrejection',e=>{
-    const r=e.reason||{};
-    pushErr(r.message||String(r),'',0,0,r);
+const SCREENS=['login','menu','kakao','gpts','drive'];
+function showScreen(name){
+  SCREENS.forEach(k=>{
+    const el=$$('screen-'+k);
+    if(el)el.classList.toggle('active',k===name);
   });
-})();
+  const gear=$$('settingsBtn');
+  if(gear)gear.style.display=(name==='kakao')?'block':'none';
+}
 
-/* ===== 기본 설정 ===== */
+/* 🔐 기본 설정 */
 const READ_START_ROW=2;
 const WRITE_START_ROW=2;
 const FIXED_WRITE_SHEET='공유용 시트';
 
-/* ✅ 구글 OAuth 클라이언트 ID */
-const CLIENT_ID="18228268359-iifm4ck3j9kqj74eh1p90tco1k2mbpi0.apps.googleusercontent.com";
-
-/* ✅ GPTs 백엔드 Apps Script URL (웹 앱 배포 URL로 교체) */
-const SALES_API_ENDPOINT = "https://script.google.com/macros/s/여기에_웹앱_URL/exec";
-
-/* ✅ 카톡 입장자 기본 드라이브 폴더 ID */
-const DEFAULT_KAKAO_FOLDER_ID = "1OIZGro5_CVmlsNiOuvtzbnHDukPJIcQJ";
+/* ✅ 카톡 입장자 기본 폴더 (자동 연결) */
+const DEFAULT_KAKAO_FOLDER_ID="1OIZGro5_CVmlsNiOuvtzbnHDukPJIcQJ";
 
 /* ✅ 드라이브 폴더 모음(코드 내 고정) */
 const DRIVE_LINKS = [
@@ -526,53 +450,79 @@ const DRIVE_LINKS = [
     name: "입장자 체크 기본 폴더",
     label: "카톡 입장자"
   },
-  // 필요하면 여기 아래로 계속 추가
+  // 필요하면 아래 형식으로 계속 추가
   // {
   //   id: "폴더ID",
   //   url: "https://drive.google.com/drive/folders/폴더ID",
   //   name: "폴더 이름",
-  //   label: "라벨"
+  //   label: "태그"
   // },
 ];
 
-/* ===== OAuth ===== */
+/* ✅ GPTs API 키 (직접 입력) */
+const GPTS_API_KEY = ""; // TODO: 여기에 OpenAI API 키 입력
+const GPTS_MODEL = "gpt-4.1-mini";
+
+/* =========================
+   에러 핸들링
+========================= */
+(function(){
+  const pushErr=(msg,src,l,c,e)=>{
+    const details=(e&&e.stack)?'\n'+e.stack:'';
+    PANEL_SUFFIXES.forEach(s=>{
+      const el=$$('#err'+s);
+      if(el)el.textContent='오류: '+msg+(src?` (${src}:${l}:${c})`:'')+details;
+    });
+  };
+  window.addEventListener('error',e=>pushErr(e.message,e.filename,e.lineno,e.colno,e.error));
+  window.addEventListener('unhandledrejection',e=>{
+    const r=e.reason||{};
+    pushErr(r.message||String(r),'',0,0,r);
+  });
+})();
+
+/* =========================
+   OAuth / Google API
+========================= */
 let accessToken=null,tokenClient=null;
 
-function updateAdminVisibility(featureKey){
-  const gear=$$('settingsBtn');
-  if(!gear)return;
-  if(featureKey==='entrant'){
-    gear.style.display='block';
-  }else{
-    gear.style.display='none';
-  }
-}
+/* ✅ 여기에 본인 OAuth 클라이언트 ID 넣기 */
+const CLIENT_ID="여기에_본인_OAuth_클라이언트ID";
 
-/* 스크린 전환 */
-function showFeatureSection(key){
-  document.querySelectorAll('[data-feature-section]').forEach(sec=>{
-    sec.style.display = (sec.dataset.featureSection===key)?'block':'none';
-  });
-  updateAdminVisibility(key);
-}
-
+/* ===== OAuth ===== */
 function initAuth(){
   try{
-    if(!window.google?.accounts?.oauth2){txt('authErr','GIS 로드 실패');return;}
+    if(!window.google?.accounts?.oauth2){txt('authErr','Google Identity Services 로드 실패');return;}
     tokenClient=google.accounts.oauth2.initTokenClient({
       client_id:CLIENT_ID,
       scope:'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.readonly',
       prompt:'',
-      callback:res=>{
-        accessToken=res.access_token;
-        txt('authState','로그인 완료');
-        txt('authErr','');
+      callback:async res=>{
+        try{
+          accessToken=res.access_token;
+          txt('authState','로그인 완료');
+          txt('authErr','');
+          // 기본 카톡 폴더 자동 연결
+          driveFolderId.A = DEFAULT_KAKAO_FOLDER_ID;
+          driveFolderId.B = DEFAULT_KAKAO_FOLDER_ID;
+          // 로그인 후에만 드라이브 접근 시도
+          try{await refreshDriveList('A');}catch(e){console.warn(e);}
+          try{await refreshDriveList('B');}catch(e){console.warn(e);}
+          // 메뉴로 이동
+          showScreen('menu');
+        }catch(e){
+          console.error(e);
+          txt('authErr','로그인 처리 중 오류: '+(e.message||e));
+        }
       },
       error_callback:err=>{
         txt('authErr','OAuth 오류: '+(err?.error||err?.type||JSON.stringify(err)));
       }
     });
-  }catch(e){txt('authErr','OAuth 초기화 오류');console.error(e);}
+  }catch(e){
+    txt('authErr','OAuth 초기화 오류');
+    console.error(e);
+  }
 }
 function requestAccess(){
   if(!tokenClient){txt('authErr','OAuth 초기화 실패');return;}
@@ -583,17 +533,25 @@ function revokeAccess(){
     google.accounts.oauth2.revoke(accessToken,()=>{
       accessToken=null;
       txt('authState','미로그인');
+      showScreen('login');
     });
-  }else{
-    txt('authState','미로그인');
   }
 }
-function requireAuth(){if(!accessToken)throw new Error('먼저 Google 로그인하세요.');}
+function requireAuth(){
+  if(!accessToken)throw new Error('먼저 Google 로그인하세요.');
+}
 
-/* ===== Sheets / Drive 공통 ===== */
+/* ===== Sheets 공통 ===== */
 async function gFetch(url,init){
   requireAuth();
-  const res=await fetch(url,{...(init||{}),headers:{...(init&&init.headers||{}),Authorization:'Bearer '+accessToken,'Content-Type':'application/json'}});
+  const res=await fetch(url,{
+    ...(init||{}),
+    headers:{
+      ...(init&&init.headers||{}),
+      Authorization:'Bearer '+accessToken,
+      'Content-Type':'application/json'
+    }
+  });
   if(!res.ok)throw new Error(await res.text());
   return res.json();
 }
@@ -610,16 +568,10 @@ async function batchUpdateValues(spreadsheetId,dataRanges){
   const url=`https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}/values:batchUpdate`;
   return await gFetch(url,{method:'POST',body:JSON.stringify({valueInputOption:'USER_ENTERED',data:dataRanges})});
 }
-async function getDriveFolderName(folderId){
-  requireAuth();
-  const url=`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(folderId)}?fields=name`;
-  const res=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
-  if(!res.ok)throw new Error(await res.text());
-  const data=await res.json();
-  return data.name||folderId;
-}
 
-/* ===== 관리자 저장 ===== */
+/* =========================
+   스프레드시트 연결 저장 (관리자)
+========================= */
 const PACKS_KEY='ca_gsapi_sources_v12';
 const loadPacks=()=>{try{return JSON.parse(localStorage.getItem(PACKS_KEY)||'[]');}catch(e){return[];}};
 const savePacks=ps=>localStorage.setItem(PACKS_KEY,JSON.stringify(ps));
@@ -654,7 +606,7 @@ function renderAdmList(){
   if(!list.length){tb.innerHTML='<tr><td colspan="4" style="color:#64748b">없음</td></tr>';txt('admMeta','');return;}
   list.forEach(p=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${p.label}</td><td>${p.sheets?.length||0}</td><td>${p.readCol}</td><td><button class="btn" data-del="${p.id}" type="button">삭제</button></td>`;
+    tr.innerHTML=`<td>${p.label}</td><td>${p.sheets?.length||0}</td><td>${p.readCol}</td><td><button class="btn" data-del="${p.id}" type="button" style="height:30px;font-size:11px;padding:0 8px">삭제</button></td>`;
     tb.appendChild(tr);
   });
   tb.querySelectorAll('button[data-del]').forEach(b=>b.addEventListener('click',e=>{
@@ -663,7 +615,9 @@ function renderAdmList(){
   txt('admMeta',`총 ${list.length}개 연결 · ${new Date().toLocaleString()}`);
 }
 
-/* ===== 시트 셀렉트 ===== */
+/* =========================
+   시트 셀렉트
+========================= */
 function populatePacks(sfx){
   const packs=loadPacks();const sel=byPanel('sheetPackSelect',sfx);if(!sel)return;sel.innerHTML='';
   const readSel=byPanel('readSheetSelect',sfx);
@@ -675,7 +629,10 @@ function populatePacks(sfx){
   sel.appendChild(new Option('스프레드시트 선택',''));
   packs.forEach(p=>sel.appendChild(new Option(p.label,p.id)));
   const prev=sessionStorage.getItem('ca_prev_pack_'+sfx);
-  if(prev){const o=[...sel.options].find(x=>x.value===prev);if(o)o.selected=true;}
+  if(prev){
+    const o=[...sel.options].find(x=>x.value===prev);
+    if(o)o.selected=true;
+  }
   onPackChanged(sfx);
 }
 async function refreshMeta(sfx){
@@ -698,8 +655,10 @@ function onPackChanged(sfx){
   (p.sheets||[]).forEach(t=>{if(readSel)readSel.appendChild(new Option(t,t));});
 }
 
-/* ===== 드라이브 (입장자 체크용 txt/csv) ===== */
-let driveFolderId={A:DEFAULT_KAKAO_FOLDER_ID,B:DEFAULT_KAKAO_FOLDER_ID};
+/* =========================
+   드라이브 폴더 / 파일 (카톡용)
+========================= */
+let driveFolderId={A:null,B:null};
 let driveFiles={A:[],B:[]};
 
 function extractDriveFolderId(input){
@@ -708,9 +667,17 @@ function extractDriveFolderId(input){
   if(m)return m[1];
   return s;
 }
+async function getDriveFolderName(folderId){
+  requireAuth();
+  const url=`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(folderId)}?fields=name`;
+  const res=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+  if(!res.ok)throw new Error(await res.text());
+  const data=await res.json();
+  return data.name||folderId;
+}
 async function pickDriveFolder(sfx){
   try{
-    const input=prompt('구글 드라이브 폴더 URL 또는 ID를 입력하세요.','https://drive.google.com/drive/folders/'+DEFAULT_KAKAO_FOLDER_ID);
+    const input=prompt('구글 드라이브 폴더 URL 또는 ID를 입력하세요.','');
     if(!input)return;
     const id=extractDriveFolderId(input);
     if(!id)throw new Error('폴더 ID를 인식할 수 없습니다.');
@@ -761,6 +728,8 @@ async function refreshDriveList(sfx){
     alert('드라이브 파일 목록을 불러오지 못했습니다: '+e.message);
   }
 }
+
+/* ✅ txt / csv 읽기 : csv는 C열만 */
 async function readSelectedTxt(sfx){
   const idxStr=val('dirFileSelect',sfx);
   if(!idxStr)throw new Error('폴더 내 파일을 선택하세요.');
@@ -794,7 +763,20 @@ async function readSelectedTxt(sfx){
   return raw;
 }
 
-/* ===== 카톡 로그 파싱 ===== */
+/* =========================
+   카톡 로그 파싱 / 입장자 로직
+========================= */
+function digitsOnly(s){return String(s||'').replace(/[^\d]/g,'');}
+function last4Digits(s){const d=digitsOnly(s);return d.slice(-4);}
+function normalizeName(n){
+  let s=String(n||'').trim();
+  s=s.replace(/[\s]*[\(\[\{（【][^)\]\}）】]*[\)\]\}）】]\s*$/,'');
+  s=s.replace(/[/_\-\s]+$/,'');
+  s=s.replace(/\s+/g,' ');
+  return s;
+}
+const earlierId=(a,b)=>{const ai=parseInt(a,10),bi=parseInt(b,10);if(!Number.isNaN(ai)&&!Number.isNaN(bi))return ai<=bi?a:b;return(String(a)<=String(b))?a:b;};
+
 const JOIN_PAT=/(.*?)님이\s*(입장하셨습니다|들어왔습니다|입장했습니다|들어오셨습니다)[\s\.\!]*$/;
 const LEAVE_PAT=/(.*?)님이\s*(퇴장하셨습니다|나갔습니다|퇴장했습니다|나가셨습니다)[\s\.\!]*$/;
 const KICK_PAT=/(.*?)님을\s*(내보냈습니다|강퇴했습니다|추방했습니다)[\s\.\!]*$/;
@@ -823,7 +805,7 @@ function parseChat(text){
   return{events,joinedCount,leftCount};
 }
 
-/* ===== 입장자 체크 실행 ===== */
+/* ===== 카톡 실행 메인 ===== */
 async function runMain(sfx){
   try{
     txt('err','',sfx);
@@ -991,23 +973,24 @@ async function runMain(sfx){
       await batchUpdateValues(sheetId,updates);
     }
 
-    /* ✅ 인원수 카운트: 입장/미입장/미확인/퇴장 */
-    const joinCount = report.filter(r=>r[3]==='입장').length;
-    const notJoinCount = report.filter(r=>r[3]!=='입장').length;
-    const unresolvedCount = unresolved.length;
-    const leaveCount = leavers.length;
+    /* ✅ 상단 요약 pill: 입장/미입장/미확인/퇴장 */
+    const totalInRoster=report.length;
+    const attendCount=report.filter(r=>r[3]==='입장').length;
+    const notAttendCount=report.filter(r=>r[3]==='미입장').length;
+    const unresolvedCount=unresolved.length;
+    const leaversCount=leavers.length;
 
     const pills=$$('#pills'+sfx+sfx);
     if(pills){
       pills.innerHTML='';
       const mk=(t,c)=>{const s=document.createElement('span');s.className='pill '+c;s.textContent=t;return s;};
-      pills.appendChild(mk(`입장로그 join ${joinedCount}`,'ok'));
-      pills.appendChild(mk(`퇴장로그 leave ${leftCount}`,'bad'));
-      pills.appendChild(mk(`입장 ${joinCount}`,'ok'));
-      pills.appendChild(mk(`미입장 ${notJoinCount}`,'bad'));
-      pills.appendChild(mk(`미확인 ${unresolvedCount}`,'warn'));
-      pills.appendChild(mk(`퇴장 ${leaveCount}`,'warn'));
+      pills.appendChild(mk(`입장 ${attendCount}명`,'ok'));
+      pills.appendChild(mk(`미입장 ${notAttendCount}명`,'bad'));
+      pills.appendChild(mk(`미확인 ${unresolvedCount}명`,'warn'));
+      pills.appendChild(mk(`퇴장 ${leaversCount}명`,'bad'));
+      pills.appendChild(mk(`총 명단 ${totalInRoster}명`,''));
       if(previewOnly)pills.appendChild(mk('체크만','warn'));
+      pills.appendChild(mk(`로그 join ${joinedCount} / leave ${leftCount}`,''));
     }
 
     function resTbl(title,headers,rowsArr){
@@ -1021,9 +1004,9 @@ async function runMain(sfx){
       (rowsArr||[]).forEach(r=>{const tr=document.createElement('tr');(r||[]).forEach(c=>{const td=document.createElement('td');td.textContent=(c==null?'':String(c));tr.appendChild(td);});tb.appendChild(tr);});
       t.appendChild(tb);wrap.appendChild(t);resultsEl.appendChild(wrap);
     }
-    resTbl('내 명단 기준 상태(읽기 시트)',['no','name','phone','status','matched_id','notes'],report);
-    resTbl('명단 외 입장자',['name/last4 or (번호없음)'],extra);
-    resTbl('퇴장자 명단(최종)',['name/last4 or (번호없음)'],leavers);
+    resTbl('내 명단 기준 상태(읽기 시트)', ['no','name','phone','status','matched_id','notes'], report);
+    resTbl('명단 외 입장자', ['name/last4 or (번호없음)'], extra);
+    resTbl('퇴장자 명단(최종)', ['name/last4 or (번호없음)'], leavers);
     resTbl(previewOnly?'예상 갱신 결과(체크만 모드)':'공유 시트 갱신 결과',['updated_cells'],updates.map(u=>[u.range+' ← 입장']));
     resTbl('미확인 목록(공유 시트 동명이인/번호 문제)',['name','reason'],unresolved);
 
@@ -1033,7 +1016,7 @@ async function runMain(sfx){
   }
 }
 
-/* ===== 데모 (입장자) ===== */
+/* ===== 카톡 데모 ===== */
 function runDemo(sfx){
   txt('err','',sfx);
   const resultsEl=byPanel('results',sfx);
@@ -1119,22 +1102,22 @@ function runDemo(sfx){
     unresolved.push([r.name,p4?'공유시트 동명이인 + 번호불일치':'공유시트 동명이인 + 입장로그 번호없음']);
   }
 
-  /* 데모용 인원수 카운트 */
-  const joinCount = report.filter(r=>r[3]==='입장').length;
-  const notJoinCount = report.filter(r=>r[3]!=='입장').length;
-  const unresolvedCount = unresolved.length;
-  const leaveCount = leavers.length;
+  const totalInRoster=report.length;
+  const attendCount=report.filter(r=>r[3]==='입장').length;
+  const notAttendCount=report.filter(r=>r[3]==='미입장').length;
+  const unresolvedCount=unresolved.length;
+  const leaversCount=leavers.length;
 
   const pills=$$('#pills'+sfx+sfx);
   if(pills){
     pills.innerHTML='';
     const mk=(t,c)=>{const s=document.createElement('span');s.className='pill '+c;s.textContent=t;return s;};
-    pills.appendChild(mk(`입장로그 join ${joinedCount}`,'ok'));
-    pills.appendChild(mk(`퇴장로그 leave ${leftCount}`,'bad'));
-    pills.appendChild(mk(`입장 ${joinCount}`,'ok'));
-    pills.appendChild(mk(`미입장 ${notJoinCount}`,'bad'));
-    pills.appendChild(mk(`미확인 ${unresolvedCount}`,'warn'));
-    pills.appendChild(mk(`퇴장 ${leaveCount}`,'warn'));
+    pills.appendChild(mk(`입장 ${attendCount}명`,'ok'));
+    pills.appendChild(mk(`미입장 ${notAttendCount}명`,'bad'));
+    pills.appendChild(mk(`미확인 ${unresolvedCount}명`,'warn'));
+    pills.appendChild(mk(`퇴장 ${leaversCount}명`,'bad'));
+    pills.appendChild(mk(`총 명단 ${totalInRoster}명`,''));
+    pills.appendChild(mk(`로그 join ${joinedCount} / leave ${leftCount}`,''));
     pills.appendChild(mk('체크만(데모)','warn'));
   }
 
@@ -1156,279 +1139,125 @@ function runDemo(sfx){
   resTbl('미확인 목록(데모)',['name','reason'],unresolved);
 }
 
-/* ===== 클립보드 ===== */
-async function copyToClipboard(text){
-  try{
-    if(navigator.clipboard?.writeText){
-      await navigator.clipboard.writeText(text);
-    }else{
-      const ta=document.createElement('textarea');
-      ta.value=text;
-      ta.style.position='fixed';
-      ta.style.opacity='0';
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-    }
-    alert('복사되었습니다.');
-  }catch(e){
-    alert('복사 실패: '+e.message);
-  }
+/* =========================
+   GPTs 멘트 관리
+========================= */
+const GPTS_STORE_KEY='ca_gpts_items_v1';
+let gptsItems=[];
+function loadGpts(){
+  try{return JSON.parse(localStorage.getItem(GPTS_STORE_KEY)||'[]');}catch(e){return[];}
 }
-
-/* ===== 세일즈 멘트 GPTs ===== */
-const SALES_SAVED_KEY = 'ca_sales_saved_v1';
-
-function loadSalesSaved(){
-  try{return JSON.parse(localStorage.getItem(SALES_SAVED_KEY)||'[]');}
-  catch(e){return[];}
-}
-function saveSalesSaved(list){
-  localStorage.setItem(SALES_SAVED_KEY,JSON.stringify(list));
-}
-function renderSalesSaved(){
-  const box=$$('#salesSavedList');
-  if(!box)return;
-  const list=loadSalesSaved();
-  box.innerHTML='';
-  if(!list.length){
-    const empty=document.createElement('div');
-    empty.className='hint';
-    empty.textContent='저장된 멘트가 없습니다.';
-    box.appendChild(empty);
+function saveGpts(){localStorage.setItem(GPTS_STORE_KEY,JSON.stringify(gptsItems));}
+function renderGptsList(){
+  const wrap=$$('gptsList');if(!wrap)return;
+  wrap.innerHTML='';
+  if(!gptsItems.length){
+    wrap.innerHTML='<p class="hint">저장된 멘트가 없습니다.</p>';
     return;
   }
-  list.forEach(item=>{
-    const wrap=document.createElement('div');
-    wrap.className='sales-card';
-    wrap.style.background='#f8fafc';
-    const topRow=document.createElement('div');
-    topRow.className='row';
-    topRow.style.justifyContent='space-between';
-    const title=document.createElement('div');
-    title.style.fontSize='13px';
-    title.innerHTML=`<strong>${item.typeLabel||'멘트'}</strong> · <span style="color:#64748b">${item.target||''}</span>`;
-    const btnRow=document.createElement('div');
-    btnRow.className='row';
-    const copyBtn=document.createElement('button');
-    copyBtn.className='btn btn-sm';
-    copyBtn.textContent='복사';
-    copyBtn.addEventListener('click',()=>copyToClipboard(item.content));
-    const delBtn=document.createElement('button');
-    delBtn.className='btn btn-sm';
-    delBtn.textContent='삭제';
-    delBtn.addEventListener('click',()=>{
-      const cur=loadSalesSaved().filter(x=>x.id!==item.id);
-      saveSalesSaved(cur);
-      renderSalesSaved();
-    });
-    btnRow.appendChild(copyBtn);
-    btnRow.appendChild(delBtn);
-    topRow.appendChild(title);
-    topRow.appendChild(btnRow);
-
-    const ta=document.createElement('textarea');
-    ta.className='input';
-    ta.style.marginTop='6px';
-    ta.style.resize='vertical';
-    ta.value=item.content;
-    ta.rows=3;
-    ta.addEventListener('change',()=>{
-      const cur=loadSalesSaved();
-      const idx=cur.findIndex(x=>x.id===item.id);
-      if(idx>=0){cur[idx].content=ta.value;saveSalesSaved(cur);}
-    });
-
-    const meta=document.createElement('div');
-    meta.className='sales-meta';
-    meta.textContent=new Date(item.createdAt||Date.now()).toLocaleString();
-
-    wrap.appendChild(topRow);
-    wrap.appendChild(ta);
-    wrap.appendChild(meta);
-    box.appendChild(wrap);
+  gptsItems.slice().reverse().forEach(item=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.style.marginBottom='8px';
+    card.innerHTML=`
+      <div class="gpts-item-title">${item.title||'제목 없음'}</div>
+      <div class="gpts-item-meta">${new Date(item.createdAt).toLocaleString()}</div>
+      <div class="gpts-item-text">${(item.text||'').replace(/</g,'&lt;')}</div>
+      <div class="gpts-item-actions">
+        <button class="btn" type="button" data-act="copy" data-id="${item.id}" style="height:32px;font-size:12px">복사</button>
+        <button class="btn" type="button" data-act="edit" data-id="${item.id}" style="height:32px;font-size:12px">편집으로 불러오기</button>
+        <button class="btn" type="button" data-act="delete" data-id="${item.id}" style="height:32px;font-size:12px">삭제</button>
+      </div>
+    `;
+    wrap.appendChild(card);
   });
 }
-function salesTypeLabel(type){
-  switch(type){
-    case 'start': return '무료강의 시작 멘트';
-    case 'entry': return '입장 유도 멘트';
-    case 'payment': return '결제 유도 멘트';
-    case 'closing': return '마무리 멘트';
-    default: return '멘트';
-  }
+async function callGPTS(prompt){
+  if(!GPTS_API_KEY)throw new Error('GPTS_API_KEY를 코드에 입력하세요.');
+  const res=await fetch('https://api.openai.com/v1/chat/completions',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+GPTS_API_KEY
+    },
+    body:JSON.stringify({
+      model:GPTS_MODEL,
+      messages:[
+        {role:'system',content:'You are a Korean marketing copywriter who writes short, punchy sales hooks for online courses.'},
+        {role:'user',content:prompt}
+      ]
+    })
+  });
+  if(!res.ok)throw new Error(await res.text());
+  const data=await res.json();
+  return data.choices?.[0]?.message?.content?.trim()||'';
 }
-async function generateSalesMent(){
-  const target=$$('#salesTarget')?.value.trim()||'';
-  const type=$$('#salesType')?.value||'start';
-  const count=parseInt(($$('#salesCount')?.value||'5'),10)||5;
-  const notes=$$('#salesNotes')?.value.trim()||'';
-  const errEl=$$('#salesErr');
-  const metaEl=$$('#salesGenMeta');
-  const box=$$('#salesResults');
-  if(errEl)errEl.textContent='';
-  if(box)box.innerHTML='';
-  if(metaEl)metaEl.textContent='';
-
-  if(!SALES_API_ENDPOINT || SALES_API_ENDPOINT.includes('여기에_웹앱_URL')){
-    if(errEl)errEl.textContent='백엔드 URL이 설정되어 있지 않습니다. 상단 스크립트의 SALES_API_ENDPOINT를 수정하세요.';
-    return;
-  }
-
+async function handleGptsGenerate(){
   try{
-    const payload={target,type,count,notes};
-    if(metaEl)metaEl.textContent='생성 중...';
-    const res=await fetch(SALES_API_ENDPOINT,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
-    });
-    if(!res.ok)throw new Error('백엔드 오류: '+(await res.text()));
-    const data=await res.json();
-    const messages=Array.isArray(data.messages)?data.messages:[];
-
-    if(!messages.length){
-      throw new Error('응답에 멘트가 없습니다. 백엔드 로직을 확인하세요.');
-    }
-    renderSalesGenerated(messages,{target,type});
-    if(metaEl)metaEl.textContent=`${messages.length}개 생성 완료`;
+    txt('gptsError','');
+    txt('gptsStatus','생성 중...');
+    const p=val('gptsPrompt');
+    if(!p.trim())throw new Error('프롬프트/대본 내용을 입력하세요.');
+    const title=(val('gptsTitle').trim()||'세일즈 멘트');
+    const out=await callGPTS(p.trim());
+    const item={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),title,text:out,createdAt:Date.now()};
+    gptsItems.push(item);saveGpts();renderGptsList();
+    txt('gptsStatus','생성 완료. 우측 카드에서 확인하세요.');
   }catch(e){
-    if(errEl)errEl.textContent='멘트 생성 실패: '+(e?.message||e);
-    if(metaEl)metaEl.textContent='';
+    console.error(e);
+    txt('gptsError',e.message||String(e));
+    txt('gptsStatus','');
   }
 }
-function renderSalesGenerated(list,ctx){
-  const box=$$('#salesResults');
-  if(!box)return;
-  box.innerHTML='';
-  list.forEach((msg,idx)=>{
-    const wrap=document.createElement('div');
-    wrap.className='sales-card';
 
-    const topRow=document.createElement('div');
-    topRow.className='row';
-    topRow.style.justifyContent='space-between';
-    const title=document.createElement('div');
-    title.style.fontSize='13px';
-    title.innerHTML=`<strong>멘트 ${idx+1}</strong> · <span style="color:#64748b">${salesTypeLabel(ctx.type)}</span>`;
-    const btnRow=document.createElement('div');
-    btnRow.className='row';
-    const copyBtn=document.createElement('button');
-    copyBtn.className='btn btn-sm';
-    copyBtn.textContent='복사';
-    copyBtn.addEventListener('click',()=>copyToClipboard(msg));
-    const saveBtn=document.createElement('button');
-    saveBtn.className='btn btn-sm';
-    saveBtn.textContent='저장';
-    saveBtn.addEventListener('click',()=>{
-      const cur=loadSalesSaved();
-      const item={
-        id:`${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
-        type:ctx.type,
-        typeLabel:salesTypeLabel(ctx.type),
-        target:ctx.target,
-        content:msg,
-        createdAt:Date.now()
-      };
-      cur.push(item);
-      saveSalesSaved(cur);
-      renderSalesSaved();
-      alert('저장되었습니다.');
-    });
-    btnRow.appendChild(copyBtn);
-    btnRow.appendChild(saveBtn);
-    topRow.appendChild(title);
-    topRow.appendChild(btnRow);
-
-    const body=document.createElement('div');
-    body.style.marginTop='6px';
-    body.style.whiteSpace='pre-wrap';
-    body.textContent=msg;
-
-    wrap.appendChild(topRow);
-    wrap.appendChild(body);
-    box.appendChild(wrap);
-  });
-}
-
-/* ===== 드라이브 폴더 모음 (코드 고정) ===== */
+/* =========================
+   드라이브 폴더 모음 UI
+========================= */
 function renderDriveLinks(){
-  const box=$$('#driveFolderList');
-  if(!box)return;
-  box.innerHTML='';
+  const wrap=$$('driveCards');if(!wrap)return;
+  wrap.innerHTML='';
   if(!DRIVE_LINKS.length){
-    const empty=document.createElement('div');
-    empty.className='hint';
-    empty.textContent='등록된 폴더가 없습니다. 코드 상단 DRIVE_LINKS 상수를 수정해서 추가하세요.';
-    box.appendChild(empty);
+    wrap.innerHTML='<p class="hint">등록된 폴더가 없습니다. 코드 상단 DRIVE_LINKS 배열에 추가해주세요.</p>';
     return;
   }
-  DRIVE_LINKS.forEach(item=>{
+  DRIVE_LINKS.forEach(f=>{
     const card=document.createElement('div');
     card.className='drive-card';
-    card.addEventListener('click',()=>{
-      const url=item.url || `https://drive.google.com/drive/folders/${item.id}`;
-      window.open(url,'_blank');
-    });
-
-    const icon=document.createElement('div');
-    icon.style.fontSize='22px';
-    icon.textContent='📁';
-
-    const title=document.createElement('div');
-    title.className='drive-card-title';
-    title.textContent=item.name || '(제목 없음)';
-
-    const badge=document.createElement('div');
-    badge.className='badge';
-    badge.textContent=item.label || '드라이브';
-
-    const idDiv=document.createElement('div');
-    idDiv.className='drive-card-id';
-    idDiv.textContent=item.id;
-
-    card.appendChild(icon);
-    card.appendChild(title);
-    card.appendChild(badge);
-    card.appendChild(idDiv);
-    box.appendChild(card);
+    card.innerHTML=`
+      <div class="drive-title">${f.name||'(이름 없음)'}</div>
+      ${f.label?`<div class="drive-label">${f.label}</div>`:''}
+      ${f.url?`<a class="drive-link" href="${f.url}" target="_blank" rel="noopener noreferrer">${f.url}</a>`:''}
+    `;
+    wrap.appendChild(card);
   });
 }
 
-/* ===== 초기화 ===== */
+/* =========================
+   초기화
+========================= */
 window.addEventListener('load',()=>{if(window.google?.accounts?.oauth2)initAuth();});
+
 document.addEventListener('DOMContentLoaded',()=>{
+  // 초기 화면
+  showScreen('login');
+
+  // 로그인 / 로그아웃
   on('gsLoginBtn','click',requestAccess);
   on('gsLogoutBtn','click',revokeAccess);
 
-  // 기능 버튼 클릭 → 스크린 전환
-  const btnEntrant=$$('featureBtnEntrant');
-  if(btnEntrant){
-    btnEntrant.addEventListener('click',()=>{
-      showFeatureSection('entrant');
-    });
-  }
-  const btnSales=$$('featureBtnSales');
-  if(btnSales){
-    btnSales.addEventListener('click',()=>{
-      showFeatureSection('sales');
-    });
-  }
-  const btnDrive=$$('featureBtnDrive');
-  if(btnDrive){
-    btnDrive.addEventListener('click',()=>{
-      showFeatureSection('drive');
-    });
-  }
+  // 메뉴 이동
+  on('toolBtnKakao','click',()=>showScreen('kakao'));
+  on('toolBtnGPTS','click',()=>showScreen('gpts'));
+  on('toolBtnDrive','click',()=>showScreen('drive'));
 
-  // 처음 로딩 시 입장자 체크 화면 보이게
-  showFeatureSection('entrant');
+  on('backFromKakao','click',()=>showScreen('menu'));
+  on('backFromGPTS','click',()=>showScreen('menu'));
+  on('backFromDrive','click',()=>showScreen('menu'));
 
-  // 관리자 패널
+  // 관리자 드로어
   const overlay=$$('adminOverlay'),drawer=$$('adminDrawer');
-  const openAdmin=()=>{if(overlay&&drawer){show(overlay);show(drawer);renderAdmList();}};
-  const closeAdmin=()=>{if(overlay&&drawer){hide(overlay);hide(drawer);}};
+  const openAdmin=()=>{if(overlay&&drawer){overlay.classList.add('open');drawer.classList.add('open');overlay.setAttribute('aria-hidden','false');drawer.setAttribute('aria-hidden','false');renderAdmList();}};
+  const closeAdmin=()=>{if(overlay&&drawer){overlay.classList.remove('open');drawer.classList.remove('open');overlay.setAttribute('aria-hidden','true');drawer.setAttribute('aria-hidden','true');}};
   on('settingsBtn','click',openAdmin);
   on('closeAdmin','click',closeAdmin);
   if(overlay)overlay.addEventListener('click',closeAdmin);
@@ -1436,7 +1265,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   on('admAdd','click',admAdd);
   on('admClearAll','click',()=>{if(confirm('모든 연결을 삭제할까요?')){clearPacks();renderAdmList();populatePacks('A');populatePacks('B');}});
 
-  // 입장자 패널 A/B
+  // Panel A
   on('sheetPackSelect','change',()=>onPackChanged('A'),'A');
   on('refreshMeta','click',()=>refreshMeta('A'),'A');
   on('runBtn','click',()=>runMain('A'),'A');
@@ -1444,6 +1273,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   on('dirPick','click',()=>pickDriveFolder('A'),'A');
   on('dirRefresh','click',()=>refreshDriveList('A'),'A');
 
+  // Panel B
   on('sheetPackSelect','change',()=>onPackChanged('B'),'B');
   on('refreshMeta','click',()=>refreshMeta('B'),'B');
   on('runBtn','click',()=>runMain('B'),'B');
@@ -1454,23 +1284,40 @@ document.addEventListener('DOMContentLoaded',()=>{
   populatePacks('A');
   populatePacks('B');
 
-  // ✅ 기본 드라이브 폴더(카톡 입장자) 바로 세팅
-  refreshDriveList('A');
-  refreshDriveList('B');
+  // GPTs 초기화
+  gptsItems=loadGpts();
+  renderGptsList();
+  on('gptsGenerateBtn','click',handleGptsGenerate);
+  const gptsListEl=$$('gptsList');
+  if(gptsListEl){
+    gptsListEl.addEventListener('click',e=>{
+      const btn=e.target.closest('button[data-act]');
+      if(!btn)return;
+      const id=btn.getAttribute('data-id');
+      const act=btn.getAttribute('data-act');
+      const idx=gptsItems.findIndex(x=>x.id===id);
+      if(idx<0)return;
+      const item=gptsItems[idx];
+      if(act==='copy'){
+        if(navigator.clipboard){
+          navigator.clipboard.writeText(item.text||'').then(()=>{alert('클립보드에 복사되었습니다.');}).catch(err=>{console.error(err);alert('복사 실패: '+err);});
+        }else{
+          alert('브라우저에서 클립보드 API를 지원하지 않습니다.');
+        }
+      }else if(act==='edit'){
+        const t=$$('gptsTitle'),p=$$('gptsPrompt');
+        if(t)t.value=item.title||'';
+        if(p)p.value=item.text||'';
+        showScreen('gpts');
+      }else if(act==='delete'){
+        if(confirm('이 멘트를 삭제할까요?')){
+          gptsItems.splice(idx,1);saveGpts();renderGptsList();
+        }
+      }
+    });
+  }
 
-  // 세일즈 멘트
-  const salesBtn=$$('#salesGenBtn');
-  if(salesBtn)salesBtn.addEventListener('click',generateSalesMent);
-  const clearSaved=$$('#salesClearSaved');
-  if(clearSaved)clearSaved.addEventListener('click',()=>{
-    if(confirm('저장된 멘트를 모두 삭제할까요?')){
-      saveSalesSaved([]);
-      renderSalesSaved();
-    }
-  });
-  renderSalesSaved();
-
-  // 드라이브 폴더 모음 (고정 목록)
+  // 드라이브 폴더 모음 초기 렌더
   renderDriveLinks();
 });
 </script>
