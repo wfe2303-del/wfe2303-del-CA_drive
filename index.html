@@ -36,15 +36,12 @@
       border-radius:999px;
       font-size:12px;
     }
-
-    /* 큰 버튼 */
     .btn-lg{
       height:52px;
       padding:0 26px;
       font-size:16px;
       border-radius:999px;
     }
-
     .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .hint{color:#64748b;font-size:12px}
     .err{color:#ef4444;font-family:ui-monospace,monospace;white-space:pre-wrap}
@@ -130,6 +127,7 @@
       background:linear-gradient(135deg,#f9fafb,#eff6ff);
       border:1px solid #dbe3f0;
       font-size:13px;
+      cursor:pointer;
     }
     .feature-btn:hover{
       border-color:var(--accent-strong);
@@ -190,11 +188,6 @@
       color:#1d4ed8;
       align-self:flex-start;
     }
-    .drive-del-btn{
-      position:absolute;top:6px;right:6px;
-      border-radius:999px;
-      font-size:11px;
-    }
   </style>
 </head>
 <body>
@@ -226,7 +219,7 @@
     </div>
 
     <!-- 기능 선택 메뉴 -->
-    <div class="card" id="featureMenuCard" style="display:none">
+    <div class="card" id="featureMenuCard">
       <label>기능 선택</label>
       <div class="feature-buttons">
         <button id="featureBtnEntrant" class="btn feature-btn primary" type="button">
@@ -251,14 +244,14 @@
         </button>
       </div>
       <div class="hint" style="margin-top:6px">
-        Google 로그인 후 사용하고 싶은 기능 버튼을 눌러주세요.
+        기능은 로그인 여부와 상관없이 눌러볼 수 있고, 실사용 시에는 Google 로그인이 필요합니다.
       </div>
     </div>
 
     <!-- 기능별 섹션 -->
     <div id="featureContainer">
       <!-- ✅ 입장자 체크 -->
-      <section id="featureEntrant" data-feature-section="entrant" style="display:none">
+      <section id="featureEntrant" data-feature-section="entrant">
         <div class="panels">
           <!-- Panel A -->
           <section>
@@ -288,7 +281,7 @@
                 <label style="margin-top:8px"></label>
                 <div class="dirline">
                   <button id="dirPickA" class="btn" type="button">폴더</button>
-                  <div class="dirlabel" id="dirNameA"></div>
+                  <div class="dirlabel connected" id="dirNameA"></div>
                   <select id="dirFileSelectA"></select>
                   <button id="dirRefreshA" class="icon-btn" type="button">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -340,7 +333,7 @@
                 <label style="margin-top:8px"></label>
                 <div class="dirline">
                   <button id="dirPickB" class="btn" type="button">폴더</button>
-                  <div class="dirlabel" id="dirNameB"></div>
+                  <div class="dirlabel connected" id="dirNameB"></div>
                   <select id="dirFileSelectB"></select>
                   <button id="dirRefreshB" class="icon-btn" type="button">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -422,20 +415,18 @@
         </div>
       </section>
 
-      <!-- ✅ 드라이브 폴더 링크 모음 -->
+      <!-- ✅ 드라이브 폴더 링크 모음 (코드 내 고정 목록) -->
       <section id="featureDrive" data-feature-section="drive" style="display:none">
         <div class="card">
           <h2 style="margin-top:0;margin-bottom:8px">드라이브 폴더 모음</h2>
           <div class="hint" style="margin-bottom:10px">
-            자주 사용하는 강의 / 기수별 드라이브 폴더를 카드로 저장해두고 바로 열 수 있습니다.
+            코드 안에 미리 등록해둔 드라이브 폴더 목록입니다. 폴더 카드를 클릭하면 새 탭에서 열립니다.
           </div>
-          <button class="btn acc" id="addDriveBtn">+ 폴더 추가</button>
-          <div id="driveErr" class="err" style="margin-top:6px"></div>
           <div id="driveFolderList" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px"></div>
         </div>
       </section>
 
-      <!-- 챗봇/CSV는 나중용 자리 -->
+      <!-- 챗봇/CSV는 자리만 -->
       <section id="featureChatbot" data-feature-section="chatbot" style="display:none"></section>
       <section id="featureCsv" data-feature-section="csv" style="display:none"></section>
     </div>
@@ -518,11 +509,31 @@ const READ_START_ROW=2;
 const WRITE_START_ROW=2;
 const FIXED_WRITE_SHEET='공유용 시트';
 
-/* ✅ 여기에 본인 OAuth 클라이언트 ID 넣기 */
+/* ✅ 구글 OAuth 클라이언트 ID */
 const CLIENT_ID="18228268359-iifm4ck3j9kqj74eh1p90tco1k2mbpi0.apps.googleusercontent.com";
 
 /* ✅ GPTs 백엔드 Apps Script URL (웹 앱 배포 URL로 교체) */
 const SALES_API_ENDPOINT = "https://script.google.com/macros/s/여기에_웹앱_URL/exec";
+
+/* ✅ 카톡 입장자 기본 드라이브 폴더 ID */
+const DEFAULT_KAKAO_FOLDER_ID = "1OIZGro5_CVmlsNiOuvtzbnHDukPJIcQJ";
+
+/* ✅ 드라이브 폴더 모음(코드 내 고정) */
+const DRIVE_LINKS = [
+  {
+    id: "1OIZGro5_CVmlsNiOuvtzbnHDukPJIcQJ",
+    url: "https://drive.google.com/drive/folders/1OIZGro5_CVmlsNiOuvtzbnHDukPJIcQJ?usp=drive_link",
+    name: "입장자 체크 기본 폴더",
+    label: "카톡 입장자"
+  },
+  // 필요하면 여기 아래로 계속 추가
+  // {
+  //   id: "폴더ID",
+  //   url: "https://drive.google.com/drive/folders/폴더ID",
+  //   name: "폴더 이름",
+  //   label: "라벨"
+  // },
+];
 
 /* ===== OAuth ===== */
 let accessToken=null,tokenClient=null;
@@ -534,17 +545,6 @@ function updateAdminVisibility(featureKey){
     gear.style.display='block';
   }else{
     gear.style.display='none';
-  }
-}
-
-function setFeatureVisibility(isLoggedIn){
-  const menuCard=$$('featureMenuCard');
-  if(menuCard) menuCard.style.display=isLoggedIn?'block':'none';
-  if(!isLoggedIn){
-    document.querySelectorAll('[data-feature-section]').forEach(sec=>{
-      sec.style.display='none';
-    });
-    updateAdminVisibility(null);
   }
 }
 
@@ -567,7 +567,6 @@ function initAuth(){
         accessToken=res.access_token;
         txt('authState','로그인 완료');
         txt('authErr','');
-        setFeatureVisibility(true);
       },
       error_callback:err=>{
         txt('authErr','OAuth 오류: '+(err?.error||err?.type||JSON.stringify(err)));
@@ -584,16 +583,14 @@ function revokeAccess(){
     google.accounts.oauth2.revoke(accessToken,()=>{
       accessToken=null;
       txt('authState','미로그인');
-      setFeatureVisibility(false);
     });
   }else{
-    setFeatureVisibility(false);
     txt('authState','미로그인');
   }
 }
 function requireAuth(){if(!accessToken)throw new Error('먼저 Google 로그인하세요.');}
 
-/* ===== Sheets ===== */
+/* ===== Sheets / Drive 공통 ===== */
 async function gFetch(url,init){
   requireAuth();
   const res=await fetch(url,{...(init||{}),headers:{...(init&&init.headers||{}),Authorization:'Bearer '+accessToken,'Content-Type':'application/json'}});
@@ -612,6 +609,14 @@ async function getRange(spreadsheetId,rangeA1){
 async function batchUpdateValues(spreadsheetId,dataRanges){
   const url=`https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}/values:batchUpdate`;
   return await gFetch(url,{method:'POST',body:JSON.stringify({valueInputOption:'USER_ENTERED',data:dataRanges})});
+}
+async function getDriveFolderName(folderId){
+  requireAuth();
+  const url=`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(folderId)}?fields=name`;
+  const res=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+  if(!res.ok)throw new Error(await res.text());
+  const data=await res.json();
+  return data.name||folderId;
 }
 
 /* ===== 관리자 저장 ===== */
@@ -694,7 +699,7 @@ function onPackChanged(sfx){
 }
 
 /* ===== 드라이브 (입장자 체크용 txt/csv) ===== */
-let driveFolderId={A:null,B:null};
+let driveFolderId={A:DEFAULT_KAKAO_FOLDER_ID,B:DEFAULT_KAKAO_FOLDER_ID};
 let driveFiles={A:[],B:[]};
 
 function extractDriveFolderId(input){
@@ -703,17 +708,9 @@ function extractDriveFolderId(input){
   if(m)return m[1];
   return s;
 }
-async function getDriveFolderName(folderId){
-  requireAuth();
-  const url=`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(folderId)}?fields=name`;
-  const res=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
-  if(!res.ok)throw new Error(await res.text());
-  const data=await res.json();
-  return data.name||folderId;
-}
 async function pickDriveFolder(sfx){
   try{
-    const input=prompt('구글 드라이브 폴더 URL 또는 ID를 입력하세요.','');
+    const input=prompt('구글 드라이브 폴더 URL 또는 ID를 입력하세요.','https://drive.google.com/drive/folders/'+DEFAULT_KAKAO_FOLDER_ID);
     if(!input)return;
     const id=extractDriveFolderId(input);
     if(!id)throw new Error('폴더 ID를 인식할 수 없습니다.');
@@ -764,7 +761,6 @@ async function refreshDriveList(sfx){
     alert('드라이브 파일 목록을 불러오지 못했습니다: '+e.message);
   }
 }
-
 async function readSelectedTxt(sfx){
   const idxStr=val('dirFileSelect',sfx);
   if(!idxStr)throw new Error('폴더 내 파일을 선택하세요.');
@@ -798,7 +794,7 @@ async function readSelectedTxt(sfx){
   return raw;
 }
 
-/* ===== 카톡 파싱 ===== */
+/* ===== 카톡 로그 파싱 ===== */
 const JOIN_PAT=/(.*?)님이\s*(입장하셨습니다|들어왔습니다|입장했습니다|들어오셨습니다)[\s\.\!]*$/;
 const LEAVE_PAT=/(.*?)님이\s*(퇴장하셨습니다|나갔습니다|퇴장했습니다|나가셨습니다)[\s\.\!]*$/;
 const KICK_PAT=/(.*?)님을\s*(내보냈습니다|강퇴했습니다|추방했습니다)[\s\.\!]*$/;
@@ -827,7 +823,7 @@ function parseChat(text){
   return{events,joinedCount,leftCount};
 }
 
-/* ===== 실행 (입장자 체크) ===== */
+/* ===== 입장자 체크 실행 ===== */
 async function runMain(sfx){
   try{
     txt('err','',sfx);
@@ -995,13 +991,22 @@ async function runMain(sfx){
       await batchUpdateValues(sheetId,updates);
     }
 
+    /* ✅ 인원수 카운트: 입장/미입장/미확인/퇴장 */
+    const joinCount = report.filter(r=>r[3]==='입장').length;
+    const notJoinCount = report.filter(r=>r[3]!=='입장').length;
+    const unresolvedCount = unresolved.length;
+    const leaveCount = leavers.length;
+
     const pills=$$('#pills'+sfx+sfx);
     if(pills){
       pills.innerHTML='';
       const mk=(t,c)=>{const s=document.createElement('span');s.className='pill '+c;s.textContent=t;return s;};
       pills.appendChild(mk(`입장로그 join ${joinedCount}`,'ok'));
       pills.appendChild(mk(`퇴장로그 leave ${leftCount}`,'bad'));
-      pills.appendChild(mk(`입장 대상(읽기시트) ${attendingSetN.size}`,'warn'));
+      pills.appendChild(mk(`입장 ${joinCount}`,'ok'));
+      pills.appendChild(mk(`미입장 ${notJoinCount}`,'bad'));
+      pills.appendChild(mk(`미확인 ${unresolvedCount}`,'warn'));
+      pills.appendChild(mk(`퇴장 ${leaveCount}`,'warn'));
       if(previewOnly)pills.appendChild(mk('체크만','warn'));
     }
 
@@ -1113,16 +1118,27 @@ function runDemo(sfx){
     if(p4&&set.has(p4))continue;
     unresolved.push([r.name,p4?'공유시트 동명이인 + 번호불일치':'공유시트 동명이인 + 입장로그 번호없음']);
   }
+
+  /* 데모용 인원수 카운트 */
+  const joinCount = report.filter(r=>r[3]==='입장').length;
+  const notJoinCount = report.filter(r=>r[3]!=='입장').length;
+  const unresolvedCount = unresolved.length;
+  const leaveCount = leavers.length;
+
   const pills=$$('#pills'+sfx+sfx);
   if(pills){
     pills.innerHTML='';
     const mk=(t,c)=>{const s=document.createElement('span');s.className='pill '+c;s.textContent=t;return s;};
-    const attendingCount=roster.filter(r=>(active.get(normalizeName(r.name))||new Set()).size>0).length;
     pills.appendChild(mk(`입장로그 join ${joinedCount}`,'ok'));
     pills.appendChild(mk(`퇴장로그 leave ${leftCount}`,'bad'));
-    pills.appendChild(mk(`입장 대상(읽기시트) ${attendingCount}`,'warn'));
-    pills.appendChild(mk('체크만','warn'));
+    pills.appendChild(mk(`입장 ${joinCount}`,'ok'));
+    pills.appendChild(mk(`미입장 ${notJoinCount}`,'bad'));
+    pills.appendChild(mk(`미확인 ${unresolvedCount}`,'warn'));
+    pills.appendChild(mk(`퇴장 ${leaveCount}`,'warn'));
+    pills.appendChild(mk('체크만(데모)','warn'));
   }
+
+  const resultsEl=byPanel('results',sfx);
   function resTbl(title,headers,rowsArr){
     if(!resultsEl)return;
     const wrap=document.createElement('div');wrap.className='card';
@@ -1140,7 +1156,7 @@ function runDemo(sfx){
   resTbl('미확인 목록(데모)',['name','reason'],unresolved);
 }
 
-/* ===== 공통: 클립보드 ===== */
+/* ===== 클립보드 ===== */
 async function copyToClipboard(text){
   try{
     if(navigator.clipboard?.writeText){
@@ -1171,7 +1187,6 @@ function loadSalesSaved(){
 function saveSalesSaved(list){
   localStorage.setItem(SALES_SAVED_KEY,JSON.stringify(list));
 }
-
 function renderSalesSaved(){
   const box=$$('#salesSavedList');
   if(!box)return;
@@ -1235,7 +1250,6 @@ function renderSalesSaved(){
     box.appendChild(wrap);
   });
 }
-
 function salesTypeLabel(type){
   switch(type){
     case 'start': return '무료강의 시작 멘트';
@@ -1245,7 +1259,6 @@ function salesTypeLabel(type){
     default: return '멘트';
   }
 }
-
 async function generateSalesMent(){
   const target=$$('#salesTarget')?.value.trim()||'';
   const type=$$('#salesType')?.value||'start';
@@ -1285,7 +1298,6 @@ async function generateSalesMent(){
     if(metaEl)metaEl.textContent='';
   }
 }
-
 function renderSalesGenerated(list,ctx){
   const box=$$('#salesResults');
   if(!box)return;
@@ -1340,29 +1352,19 @@ function renderSalesGenerated(list,ctx){
   });
 }
 
-/* ===== 드라이브 폴더 링크 모음 ===== */
-const DRIVE_LINK_KEY='ca_drive_links_v1';
-
-function loadDriveLinks(){
-  try{return JSON.parse(localStorage.getItem(DRIVE_LINK_KEY)||'[]');}
-  catch(e){return[];}
-}
-function saveDriveLinks(list){
-  localStorage.setItem(DRIVE_LINK_KEY,JSON.stringify(list));
-}
+/* ===== 드라이브 폴더 모음 (코드 고정) ===== */
 function renderDriveLinks(){
   const box=$$('#driveFolderList');
   if(!box)return;
-  const list=loadDriveLinks();
   box.innerHTML='';
-  if(!list.length){
+  if(!DRIVE_LINKS.length){
     const empty=document.createElement('div');
     empty.className='hint';
-    empty.textContent='등록된 폴더가 없습니다. "+ 폴더 추가" 버튼으로 등록해보세요.';
+    empty.textContent='등록된 폴더가 없습니다. 코드 상단 DRIVE_LINKS 상수를 수정해서 추가하세요.';
     box.appendChild(empty);
     return;
   }
-  list.forEach(item=>{
+  DRIVE_LINKS.forEach(item=>{
     const card=document.createElement('div');
     card.className='drive-card';
     card.addEventListener('click',()=>{
@@ -1386,56 +1388,12 @@ function renderDriveLinks(){
     idDiv.className='drive-card-id';
     idDiv.textContent=item.id;
 
-    const delBtn=document.createElement('button');
-    delBtn.className='btn btn-sm drive-del-btn';
-    delBtn.textContent='×';
-    delBtn.addEventListener('click',ev=>{
-      ev.stopPropagation();
-      const cur=loadDriveLinks().filter(x=>x.id!==item.id);
-      saveDriveLinks(cur);
-      renderDriveLinks();
-    });
-
     card.appendChild(icon);
     card.appendChild(title);
     card.appendChild(badge);
     card.appendChild(idDiv);
-    card.appendChild(delBtn);
     box.appendChild(card);
   });
-}
-
-async function addDriveLink(){
-  const err=$$('#driveErr');
-  if(err)err.textContent='';
-  try{
-    const url=prompt('드라이브 폴더 URL 또는 ID를 입력하세요.','');
-    if(!url)return;
-    const idMatch=url.match(/folders\/([a-zA-Z0-9_-]+)/);
-    const folderId=idMatch?idMatch[1]:url.trim();
-    if(!folderId)throw new Error('폴더 ID를 인식하지 못했습니다.');
-
-    // 폴더 이름은 Drive API로 받아오기 (로그인 필요)
-    let name=folderId;
-    try{
-      name=await getDriveFolderName(folderId);
-    }catch(e){
-      console.warn('폴더 이름 조회 실패',e);
-    }
-    const labelPrompt=prompt('이 폴더에 붙일 라벨(선택):','');
-    const item={
-      id:folderId,
-      url:url.includes('http')?url:`https://drive.google.com/drive/folders/${folderId}`,
-      name,
-      label:labelPrompt||'드라이브'
-    };
-    const cur=loadDriveLinks();
-    cur.push(item);
-    saveDriveLinks(cur);
-    renderDriveLinks();
-  }catch(e){
-    if(err)err.textContent='폴더 추가 실패: '+(e?.message||e);
-  }
 }
 
 /* ===== 초기화 ===== */
@@ -1444,7 +1402,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   on('gsLoginBtn','click',requestAccess);
   on('gsLogoutBtn','click',revokeAccess);
 
-  // 기능 버튼
+  // 기능 버튼 클릭 → 스크린 전환
   const btnEntrant=$$('featureBtnEntrant');
   if(btnEntrant){
     btnEntrant.addEventListener('click',()=>{
@@ -1463,6 +1421,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       showFeatureSection('drive');
     });
   }
+
+  // 처음 로딩 시 입장자 체크 화면 보이게
+  showFeatureSection('entrant');
 
   // 관리자 패널
   const overlay=$$('adminOverlay'),drawer=$$('adminDrawer');
@@ -1492,6 +1453,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   populatePacks('A');
   populatePacks('B');
+
+  // ✅ 기본 드라이브 폴더(카톡 입장자) 바로 세팅
   refreshDriveList('A');
   refreshDriveList('B');
 
@@ -1507,12 +1470,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   renderSalesSaved();
 
-  // 드라이브 링크 모음
-  const addDriveBtn=$$('#addDriveBtn');
-  if(addDriveBtn)addDriveBtn.addEventListener('click',addDriveLink);
+  // 드라이브 폴더 모음 (고정 목록)
   renderDriveLinks();
-
-  setFeatureVisibility(false);
 });
 </script>
 </body>
