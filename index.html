@@ -647,30 +647,50 @@ function readOptionsFromUI(){
 }
 
 /* ===== 추가 리포트용 실행 결과 저장(히스토리) ===== */
-const RUNS_KEY='ca_kakao_runs_v2';
-let RUNS={};
+/* ===== 추가 리포트용 실행 결과 저장(히스토리) ===== */
+// v2: 새 구조, v1: 예전 버전에서 저장한 히스토리까지 같이 읽기
+const RUNS_KEY_V2 = 'ca_kakao_runs_v2';
+const RUNS_KEY_V1 = 'ca_kakao_runs_v1';
+let RUNS = {};
 
-function loadRunsFromStorage(){
-  try{
-    const raw=localStorage.getItem(RUNS_KEY);
-    if(raw){
-      const obj=JSON.parse(raw);
-      RUNS=(obj&&typeof obj==='object')?obj:{};
-    }else{
-      RUNS={};
+function loadRunsFromStorage() {
+  RUNS = {};
+
+  // 1) 새 버전 히스토리
+  try {
+    const raw2 = localStorage.getItem(RUNS_KEY_V2);
+    if (raw2) {
+      const obj2 = JSON.parse(raw2);
+      if (obj2 && typeof obj2 === 'object') {
+        Object.assign(RUNS, obj2);
+      }
     }
-  }catch(e){
-    console.warn('실행기록 로드 실패',e);
-    RUNS={};
+  } catch (e) {
+    console.warn('실행기록(v2) 로드 실패', e);
+  }
+
+  // 2) 예전 버전 히스토리도 있으면 같이 합치기
+  try {
+    const raw1 = localStorage.getItem(RUNS_KEY_V1);
+    if (raw1) {
+      const obj1 = JSON.parse(raw1);
+      if (obj1 && typeof obj1 === 'object') {
+        Object.assign(RUNS, obj1);
+      }
+    }
+  } catch (e) {
+    console.warn('실행기록(v1) 로드 실패', e);
   }
 }
-function saveRunsToStorage(){
-  try{
-    localStorage.setItem(RUNS_KEY,JSON.stringify(RUNS));
-  }catch(e){
-    console.warn('실행기록 저장 실패',e);
+
+function saveRunsToStorage() {
+  try {
+    localStorage.setItem(RUNS_KEY_V2, JSON.stringify(RUNS));
+  } catch (e) {
+    console.warn('실행기록 저장 실패', e);
   }
 }
+
 function makeRunKey(panel,packId,readSheet){
   return `${panel}|${packId}|${readSheet}`;
 }
