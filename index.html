@@ -194,6 +194,14 @@
     .back-btn{
       margin-bottom:8px;
     }
+
+    /* 체크박스만 작게 */
+    input[type="checkbox"]{
+      width:14px;
+      height:14px;
+      margin:0;
+      vertical-align:middle;
+    }
   </style>
 </head>
 <body>
@@ -210,11 +218,10 @@
     <h1>클래스어라운드 운영봇</h1>
   </header>
 
-  <!-- 로그인/상태 바 -->
+  <!-- 로그인/상태 바 (지금은 표시용만) -->
   <div class="topbar">
-    <div class="row">
-    </div>
-    <span class="hint"></span>
+    <div class="row"></div>
+    <span class="hint" id="authState"></span>
   </div>
   <div id="authErr" class="err" style="margin-top:-6px;margin-bottom:12px"></div>
 
@@ -223,9 +230,10 @@
     <div class="card" style="text-align:center;padding:32px 20px">
       <h2 style="margin:0 0 8px;font-size:20px">운영봇 시작하기</h2>
       <p class="hint" style="margin:0 0 20px">
+        Google 계정으로 로그인 후, 카톡 입장자 체크 / 수강생 명단 관리 등을 한 곳에서 처리합니다.
       </p>
       <button id="loginMainBtn" class="btn acc" style="min-width:220px;font-size:15px;height:48px">
-        🚀로그인
+        🚀 로그인
       </button>
     </div>
   </section>
@@ -235,12 +243,14 @@
     <div class="card">
       <h2 style="margin:0 0 4px;font-size:18px">운영 기능 선택</h2>
       <p class="hint" style="margin:0 0 10px">
+        자주 사용하는 운영 기능들을 한 화면에서 관리합니다.
       </p>
       <div class="tiles">
         <!-- 카톡 입장자 체크 -->
         <button class="tile" data-goto="kakao">
           <div class="tile-title">💬 카톡 입장자 체크</div>
           <div class="tile-desc">
+            카톡 입장로그(txt/csv)와 수강생 스프레드시트를 연결해 입장 여부를 자동 체크합니다.
           </div>
         </button>
 
@@ -251,6 +261,7 @@
             <span class="tile-badge">예정</span>
           </div>
           <div class="tile-desc">
+            회사 사이트 결제자 CSV를 가져와 기수별 수강생 시트를 자동 생성/정리하는 기능을 준비 중입니다.
           </div>
         </button>
 
@@ -261,6 +272,7 @@
             <span class="tile-badge">예정</span>
           </div>
           <div class="tile-desc">
+            강의/프로젝트별 자주 쓰는 폴더를 한 곳에 모아 바로 열 수 있게 할 예정입니다.
           </div>
         </button>
 
@@ -269,6 +281,7 @@
            target="_blank" rel="noopener">
           <div class="tile-title">🧠 세일즈 멘트 GPTs 열기</div>
           <div class="tile-desc">
+            저장해 둔 세일즈 멘트 프롬프트 기반 GPTs를 새 탭에서 바로 엽니다.
           </div>
         </a>
       </div>
@@ -282,8 +295,9 @@
     <div class="card" style="margin-bottom:12px">
       <h2 style="margin:0 0 4px;font-size:18px">카톡 입장자 체크</h2>
       <p class="hint" style="margin:0">
-        카톡 입장로그(txt/csv)와 수강생 스프레드시트를 연결해,
-        공유용 시트에 자동으로 <strong>입장 상태</strong>를 기록하고 요약 리포트를 제공합니다.
+        카톡 입장로그(txt/csv)와 수강생 스프레드시트를 연결해
+        공유용 시트에 <strong>입장 상태</strong>를 기록하고,<br>
+        추가 리포트 탭에서 입장/미입장/명단 외 입장자/퇴장자 등을 한 번에 집계합니다.
       </p>
     </div>
 
@@ -408,45 +422,24 @@
         </section>
       </div>
     </section>
-    <style>
-  :root{
-    /* ... 기존 변수들 ... */
-  }
-
-  /* ... 기존 스타일들 ... */
-
-  /* ✅ 체크박스 크기/정렬 줄이기 */
-  input[type="checkbox"]{
-    width: 14px;
-    height: 14px;
-    margin: 0;
-    vertical-align: middle;
-  }
-
-  /* A/B 패널의 체크박스만 줄이고 싶으면 이렇게 써도 됨
-  #previewOnlyA,
-  #previewOnlyB{
-    width: 14px;
-    height: 14px;
-    margin: 0;
-    vertical-align: middle;
-  }
-  */
-</style>
-
 
     <!-- 추가 기능 탭 : 집계 리포트 -->
     <section id="tab-extra" class="tab-screen">
       <div class="card">
         <h3 style="margin:0 0 8px">추가 리포트</h3>
         <p class="hint" style="margin:0 0 8px">
-          기본 체크 탭에서 A나 B 패널을 실행하면, 그 결과가 이곳에 저장됩니다.<br/>
-          아래 버튼을 눌러 A/B 패널의 마지막 실행 결과를 합산한 리포트를 확인하세요.
+          기본 체크 탭에서 A/B 패널을 실행하면, 그 결과가 실행 기록으로 저장됩니다.<br/>
+          아래에서 <strong>실행 기록을 선택해서 단일 리포트</strong>를 보거나,
+          <strong>최근 A/B 패널 결과를 합산한 리포트</strong>를 볼 수 있습니다.
         </p>
-        <div class="row" style="margin-top:4px">
-          <button id="extraRefresh" class="btn acc" type="button">마지막 실행 결과 집계하기</button>
-          <span id="extraHint" class="hint"></span>
+        <div class="row" style="margin-top:4px;align-items:center">
+          <select id="extraRunSelect"
+                  style="flex:1 1 260px;min-width:220px;height:var(--ctl-h);padding:8px 10px;border-radius:var(--radius);border:1px solid var(--line);">
+          </select>
+          <button id="extraSingleBtn" class="btn" type="button">선택 리포트 보기</button>
+          <button id="extraRefresh" class="btn acc" type="button">최근 A/B 합산</button>
         </div>
+        <div class="hint" id="extraHint" style="margin-top:6px"></div>
       </div>
       <div id="extraResults" style="display:grid;gap:16px"></div>
     </section>
@@ -571,7 +564,11 @@ function normalizeName(n){
   s=s.replace(/\s+/g,' ');
   return s;
 }
-const earlierId=(a,b)=>{const ai=parseInt(a,10),bi=parseInt(b,10);if(!Number.isNaN(ai)&&!Number.isNaN(bi))return ai<=bi?a:b;return(String(a)<=String(b))?a:b;};
+const earlierId=(a,b)=>{
+  const ai=parseInt(a,10),bi=parseInt(b,10);
+  if(!Number.isNaN(ai)&&!Number.isNaN(bi))return ai<=bi?a:b;
+  return(String(a)<=String(b))?a:b;
+};
 
 (function(){
   const pushErr=(msg,src,l,c,e)=>{
@@ -649,8 +646,79 @@ function readOptionsFromUI(){
   OPTIONS.statusLabel=st||DEFAULT_OPTIONS.statusLabel;
 }
 
-/* ===== 추가 리포트용 마지막 실행 결과 저장 ===== */
-let lastRun={A:null,B:null};
+/* ===== 추가 리포트용 실행 결과 저장(히스토리) ===== */
+const RUNS_KEY='ca_kakao_runs_v2';
+let RUNS={};
+
+function loadRunsFromStorage(){
+  try{
+    const raw=localStorage.getItem(RUNS_KEY);
+    if(raw){
+      const obj=JSON.parse(raw);
+      RUNS=(obj&&typeof obj==='object')?obj:{};
+    }else{
+      RUNS={};
+    }
+  }catch(e){
+    console.warn('실행기록 로드 실패',e);
+    RUNS={};
+  }
+}
+function saveRunsToStorage(){
+  try{
+    localStorage.setItem(RUNS_KEY,JSON.stringify(RUNS));
+  }catch(e){
+    console.warn('실행기록 저장 실패',e);
+  }
+}
+function makeRunKey(panel,packId,readSheet){
+  return `${panel}|${packId}|${readSheet}`;
+}
+function saveRunResult(panel,pack,readSheet,payload){
+  if(!pack||!pack.id||!readSheet)return;
+  const key=makeRunKey(panel,pack.id,readSheet);
+  RUNS[key]={
+    key,
+    panel,
+    packId:pack.id,
+    packLabel:pack.label||'스프레드시트',
+    readSheet,
+    ts:Date.now(),
+    ...payload
+  };
+  saveRunsToStorage();
+  populateExtraRunSelect();
+}
+function getLatestRunByPanel(panel){
+  let latest=null;
+  Object.values(RUNS).forEach(r=>{
+    if(r.panel!==panel)return;
+    if(!latest||r.ts>latest.ts)latest=r;
+  });
+  return latest;
+}
+function populateExtraRunSelect(){
+  const sel=$$('#extraRunSelect');
+  if(!sel)return;
+  sel.innerHTML='';
+  const values=Object.values(RUNS);
+  if(!values.length){
+    sel.appendChild(new Option('실행 기록 없음',''));
+    return;
+  }
+  values.sort((a,b)=>b.ts-a.ts);
+  sel.appendChild(new Option('실행 기록 선택',''));
+  let fmt;
+  try{
+    fmt=new Intl.DateTimeFormat('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  }catch(e){
+    fmt={format:ts=>new Date(ts).toLocaleString()};
+  }
+  values.forEach(r=>{
+    const label=`${r.panel} · ${r.packLabel} · ${r.readSheet} · ${fmt.format(r.ts)}`;
+    sel.appendChild(new Option(label,r.key));
+  });
+}
 
 /* ===== OAuth ===== */
 let accessToken=null,tokenClient=null;
@@ -661,7 +729,7 @@ function handleLoggedIn(){
   txt('authState','로그인 완료');
   txt('authErr','');
   switchScreen('main');
-  // 기본 드라이브 폴더 A 패널에 연결
+  // 기본 드라이브 폴더 A 패널에 연결 (카톡 입장자 기본 연결)
   driveFolderId.A='1OIZGro5_CVmlsNiOuvtzbnHDukPJIcQJ';
   refreshDriveList('A');
   driveFolderId.B=null;
@@ -698,7 +766,14 @@ function requireAuth(){if(!accessToken)throw new Error('먼저 Google 로그인�
 /* ===== Sheets & Drive 공통 ===== */
 async function gFetch(url,init){
   requireAuth();
-  const res=await fetch(url,{...(init||{}),headers:{...(init&&init.headers||{}),Authorization:'Bearer '+accessToken,'Content-Type':'application/json'}});
+  const res=await fetch(url,{
+    ...(init||{}),
+    headers:{
+      ...(init&&init.headers||{}),
+      Authorization:'Bearer '+accessToken,
+      'Content-Type':'application/json'
+    }
+  });
   if(!res.ok)throw new Error(await res.text());
   return res.json();
 }
@@ -737,7 +812,13 @@ async function admAdd(){
     const readCol=(val('admReadCol').trim()||'C').toUpperCase();
     if(!sheetId)throw new Error('스프레드시트 링크/ID를 입력하세요.');
     const titles=await listSheets(sheetId);
-    const pack={id:`${Date.now()}_${Math.random().toString(36).slice(2,7)}`,label,sheetId,readCol,sheets:titles};
+    const pack={
+      id:`${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+      label,
+      sheetId,
+      readCol,
+      sheets:titles
+    };
     addPack(pack);
     ['admLabel','admUrl'].forEach(id=>{const el=$$(id);if(el)el.value='';});
     const rc=$$('admReadCol');if(rc)rc.value=readCol;
@@ -748,14 +829,19 @@ async function admAdd(){
 }
 function renderAdmList(){
   const list=loadPacks();const tb=$$('admList');if(!tb)return;tb.innerHTML='';
-  if(!list.length){tb.innerHTML='<tr><td colspan="4" style="color:#64748b">없음</td></tr>';txt('admMeta','');return;}
+  if(!list.length){
+    tb.innerHTML='<tr><td colspan="4" style="color:#64748b">없음</td></tr>';
+    txt('admMeta','');
+    return;
+  }
   list.forEach(p=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`<td>${p.label}</td><td>${p.sheets?.length||0}</td><td>${p.readCol}</td><td><button class="btn" data-del="${p.id}" type="button">삭제</button></td>`;
     tb.appendChild(tr);
   });
   tb.querySelectorAll('button[data-del]').forEach(b=>b.addEventListener('click',e=>{
-    removePack(e.target.getAttribute('data-del'));renderAdmList();populatePacks('A');populatePacks('B');
+    removePack(e.target.getAttribute('data-del'));
+    renderAdmList();populatePacks('A');populatePacks('B');
   }));
   txt('admMeta',`총 ${list.length}개 연결 · ${new Date().toLocaleString()}`);
 }
@@ -848,7 +934,12 @@ async function refreshDriveList(sfx){
   }
   try{
     const files=await listDriveTxtFiles(folderId);
-    driveFiles[sfx]=files.map(f=>({id:f.id,name:f.name,size:f.size||0,mtime:f.modifiedTime?Date.parse(f.modifiedTime):0}));
+    driveFiles[sfx]=files.map(f=>({
+      id:f.id,
+      name:f.name,
+      size:f.size||0,
+      mtime:f.modifiedTime?Date.parse(f.modifiedTime):0
+    }));
     if(nameSpan){
       let displayName=folderId;
       try{displayName=await getDriveFolderName(folderId);}catch(e){console.warn('폴더 이름 조회 실패',e);}
@@ -1107,6 +1198,7 @@ async function runMain(sfx){
       pills.appendChild(mk(`퇴장로그 leave ${leftCount}`,'bad'));
       pills.appendChild(mk(`입장 대상(읽기 시트) ${attendingSetN.size}`,'warn'));
       pills.appendChild(mk(`명단 외 입장자 ${extra.length}`,'warn'));
+      pills.appendChild(mk(`미확인 ${unresolved.length}`,'warn'));
       if(previewOnly)pills.appendChild(mk('체크만 모드','warn'));
     }
 
@@ -1122,37 +1214,28 @@ async function runMain(sfx){
       t.appendChild(tb);wrap.appendChild(t);resultsEl.appendChild(wrap);
     }
 
-    const summaryRows=[
-      ['총 대상 수',rosterNames.length],
-      [OPTIONS.statusLabel,attendingCount],
-      ['미입장',missingCount],
-      ['퇴장자(최종)',leavers.length],
-      ['명단 외 입장자',extra.length],
-      ['미확인(동명이인/번호 문제)',unresolved.length]
-    ];
-    resTbl('요약', ['항목','값'], summaryRows);
-
+    // 기본 체크 탭에서는 명단 위주로만 노출
     resTbl('내 명단 기준 상태(읽기 시트)', ['no','name','phone','status','matched_id','notes'], report);
     resTbl('명단 외 입장자',['name/last4 or (번호없음)'],extra);
     resTbl('퇴장자 명단(최종)',['name/last4 or (번호없음)'],leavers);
-    resTbl(previewOnly?'예상 갱신 결과(체크만 모드)':'공유 시트 갱신 결과',
-      ['updated_cells'],
-      updates.map(u=>[u.range+` ← ${OPTIONS.statusLabel}`])
-    );
     resTbl('미확인 목록(공유 시트 동명이인/번호 문제)',['name','reason'],unresolved);
 
-    // 🔹 추가 기능 탭에서 사용할 마지막 실행 결과 저장
-    lastRun[sfx]={
-      joinedCount,
-      leftCount,
-      rosterTotal:rosterNames.length,
-      attendingCount,
-      missingCount,
-      extra,
-      leavers,
-      unresolved,
-      ts:Date.now()
-    };
+    // 실행 결과를 히스토리에 저장 (추가 리포트 탭에서 사용)
+    saveRunResult(
+      sfx,
+      pack,
+      readSheet,
+      {
+        joinedCount,
+        leftCount,
+        rosterTotal:rosterNames.length,
+        attendingCount,
+        missingCount,
+        extra,
+        leavers,
+        unresolved
+      }
+    );
 
   }catch(e){
     txt('err','오류: '+(e?.message||e),sfx);
@@ -1223,7 +1306,14 @@ function runDemo(sfx){
     const any4=[...set].find(x=>x!==NAME_ONLY_SENTINEL)||'';
     const status=isActive?OPTIONS.statusLabel:'미입장';
     if(status===OPTIONS.statusLabel)attendingCount++;else missingCount++;
-    report.push([String(r.id),r.name,r.phone,status,isActive?(any4?`${r.name}/${any4}`:r.name):'',isActive&&!any4?'(번호없음)':'']);
+    report.push([
+      String(r.id),
+      r.name,
+      r.phone,
+      status,
+      isActive?(any4?`${r.name}/${any4}`:r.name):'',
+      isActive&&!any4?'(번호없음)':''
+    ]);
   }
   const extra=[];
   [...active.entries()].sort(([a],[b])=>a.localeCompare(b,'ko')).forEach(([nN,set])=>{
@@ -1256,7 +1346,8 @@ function runDemo(sfx){
     pills.appendChild(mk(`퇴장로그 leave ${leftCount}`,'bad'));
     const attendingDemo=roster.filter(r=>(active.get(normalizeName(r.name))||new Set()).size>0).length;
     pills.appendChild(mk(`입장 대상(데모) ${attendingDemo}`,'warn'));
-    pills.appendChild(mk('체크만 모드(데모)','warn'));
+    pills.appendChild(mk(`명단 외 입장자(데모) ${extra.length}`,'warn'));
+    pills.appendChild(mk(`미확인(데모) ${unresolved.length}`,'warn'));
   }
   function resTbl(title,headers,rowsArr){
     if(!resultsEl)return;
@@ -1270,47 +1361,74 @@ function runDemo(sfx){
     t.appendChild(tb);wrap.appendChild(t);resultsEl.appendChild(wrap);
   }
 
-  const summaryRows=[
-    ['총 대상 수',roster.length],
-    [OPTIONS.statusLabel,attendingCount],
-    ['미입장',missingCount],
-    ['퇴장자(데모)',leavers.length],
-    ['명단 외 입장자(데모)',extra.length],
-    ['미확인(데모)',unresolved.length]
-  ];
-  resTbl('요약(데모)', ['항목','값'], summaryRows);
-  resTbl('명단기준 입장자(데모)',['no','name','phone','status','matched_id','notes'],report);
+  resTbl('명단 기준 상태(데모)',['no','name','phone','status','matched_id','notes'],report);
   resTbl('명단 외 입장자(데모)',['name/last4 or (번호없음)'],extra);
   resTbl('퇴장자 명단(데모)',['name/last4 or (번호없음)'],leavers);
   resTbl('미확인 목록(데모)',['name','reason'],unresolved);
-
-  // 데모 실행도 lastRun에 저장 (패널별 집계용)
-  lastRun[sfx]={
-    joinedCount,
-    leftCount,
-    rosterTotal:roster.length,
-    attendingCount,
-    missingCount,
-    extra,
-    leavers,
-    unresolved,
-    ts:Date.now()
-  };
 }
 
-/* ===== 추가 리포트 집계 ===== */
+/* ===== 추가 리포트: 단일 선택 / A+B 합산 ===== */
+function buildReportCard(container,title,headers,rowsArr){
+  const wrap=document.createElement('div');wrap.className='card';
+  const h=document.createElement('h3');h.textContent=title;h.style.margin='0 0 8px';wrap.appendChild(h);
+  const t=document.createElement('table');const thead=document.createElement('thead');const trh=document.createElement('tr');
+  headers.forEach(x=>{const th=document.createElement('th');th.textContent=x;trh.appendChild(th);});
+  thead.appendChild(trh);t.appendChild(thead);
+  const tb=document.createElement('tbody');
+  (rowsArr||[]).forEach(r=>{const tr=document.createElement('tr');(r||[]).forEach(c=>{const td=document.createElement('td');td.textContent=(c==null?'':String(c));tr.appendChild(td);});tb.appendChild(tr);});
+  t.appendChild(tb);wrap.appendChild(t);container.appendChild(wrap);
+}
+
+function updateSingleExtraReport(){
+  const sel=$$('#extraRunSelect');
+  const out=$$('#extraResults');
+  const hintEl=$$('#extraHint');
+  if(!out)return;
+  out.innerHTML='';
+  const key=sel?sel.value:'';
+  if(!key||!RUNS[key]){
+    if(hintEl)hintEl.textContent='위 드롭다운에서 실행 기록을 선택하세요.';
+    return;
+  }
+  const r=RUNS[key];
+  if(hintEl)hintEl.textContent=`${r.panel} 패널 · ${r.packLabel} · ${r.readSheet} 기준 마지막 실행 리포트입니다.`;
+
+  const sumRows=[
+    ['총 대상 수',r.rosterTotal||0],
+    [OPTIONS.statusLabel,r.attendingCount||0],
+    ['미입장',r.missingCount||0],
+    ['퇴장자(최종)',(r.leavers||[]).length],
+    ['명단 외 입장자',(r.extra||[]).length],
+    ['미확인(동명이인/번호 문제)',(r.unresolved||[]).length],
+    ['입장로그 join 합계',r.joinedCount||0],
+    ['퇴장로그 leave 합계',r.leftCount||0]
+  ];
+  buildReportCard(out,'선택 실행 요약',['항목','값'],sumRows);
+
+  if(r.extra&&r.extra.length){
+    buildReportCard(out,'명단 외 입장자',['name/last4 or (번호없음)'],r.extra);
+  }
+  if(r.leavers&&r.leavers.length){
+    buildReportCard(out,'퇴장자 명단',['name/last4 or (번호없음)'],r.leavers);
+  }
+  if(r.unresolved&&r.unresolved.length){
+    buildReportCard(out,'미확인 목록',['name','reason'],r.unresolved);
+  }
+}
+
 function updateExtraReport(){
-  const hintEl=$$('extraHint');
-  const out=$$('extraResults');
+  const hintEl=$$('#extraHint');
+  const out=$$('#extraResults');
   if(!out)return;
   out.innerHTML='';
 
-  const a=lastRun.A, b=lastRun.B;
+  const a=getLatestRunByPanel('A');
+  const b=getLatestRunByPanel('B');
   if(!a && !b){
     if(hintEl)hintEl.textContent='먼저 기본 체크 탭에서 A 또는 B 패널을 한 번 이상 실행해 주세요.';
     return;
   }
-  if(hintEl)hintEl.textContent='마지막 실행된 A/B 패널 결과를 합산해 집계했습니다.';
+  if(hintEl)hintEl.textContent='최근 실행된 A/B 패널 결과를 합산해 집계했습니다.';
 
   const totalRoster=(a?.rosterTotal||0)+(b?.rosterTotal||0);
   const totalAttend=(a?.attendingCount||0)+(b?.attendingCount||0);
@@ -1320,17 +1438,6 @@ function updateExtraReport(){
   const totalExtra=(a?.extra?.length||0)+(b?.extra?.length||0);
   const totalLeavers=(a?.leavers?.length||0)+(b?.leavers?.length||0);
   const totalUnres=(a?.unresolved?.length||0)+(b?.unresolved?.length||0);
-
-  function resTbl(title,headers,rowsArr){
-    const wrap=document.createElement('div');wrap.className='card';
-    const h=document.createElement('h3');h.textContent=title;h.style.margin='0 0 8px';wrap.appendChild(h);
-    const t=document.createElement('table');const thead=document.createElement('thead');const trh=document.createElement('tr');
-    headers.forEach(x=>{const th=document.createElement('th');th.textContent=x;trh.appendChild(th);});
-    thead.appendChild(trh);t.appendChild(thead);
-    const tb=document.createElement('tbody');
-    (rowsArr||[]).forEach(r=>{const tr=document.createElement('tr');(r||[]).forEach(c=>{const td=document.createElement('td');td.textContent=(c==null?'':String(c));tr.appendChild(td);});tb.appendChild(tr);});
-    t.appendChild(tb);wrap.appendChild(t);out.appendChild(wrap);
-  }
 
   const sumRows=[
     ['총 대상 수',totalRoster],
@@ -1342,41 +1449,41 @@ function updateExtraReport(){
     ['입장로그 join 합계',totalJoined],
     ['퇴장로그 leave 합계',totalLeft]
   ];
-  resTbl('전체 패널 요약',['항목','값'],sumRows);
+  buildReportCard(out,'전체 패널 요약',['항목','값'],sumRows);
 
   const extrasCombined=[];
   if(a?.extra) a.extra.forEach(r=>extrasCombined.push(['A',r[0]]));
   if(b?.extra) b.extra.forEach(r=>extrasCombined.push(['B',r[0]]));
   if(extrasCombined.length){
-    resTbl('명단 외 입장자 (A/B 합산)',['패널','name/last4 or (번호없음)'],extrasCombined);
+    buildReportCard(out,'명단 외 입장자 (A/B 합산)',['패널','name/last4 or (번호없음)'],extrasCombined);
   }
 
   const leaversCombined=[];
   if(a?.leavers) a.leavers.forEach(r=>leaversCombined.push(['A',r[0]]));
   if(b?.leavers) b.leavers.forEach(r=>leaversCombined.push(['B',r[0]]));
   if(leaversCombined.length){
-    resTbl('퇴장자 명단 (A/B 합산)',['패널','name/last4 or (번호없음)'],leaversCombined);
+    buildReportCard(out,'퇴장자 명단 (A/B 합산)',['패널','name/last4 or (번호없음)'],leaversCombined);
   }
 
   const unresolvedCombined=[];
   if(a?.unresolved) a.unresolved.forEach(r=>unresolvedCombined.push(['A',r[0],r[1]]));
   if(b?.unresolved) b.unresolved.forEach(r=>unresolvedCombined.push(['B',r[0],r[1]]));
   if(unresolvedCombined.length){
-    resTbl('미확인 목록 (A/B 합산)',['패널','name','reason'],unresolvedCombined);
+    buildReportCard(out,'미확인 목록 (A/B 합산)',['패널','name','reason'],unresolvedCombined);
   }
 }
 
 /* ===== 초기화 ===== */
 window.addEventListener('load',()=>{if(window.google?.accounts?.oauth2)initAuth();});
 document.addEventListener('DOMContentLoaded',()=>{
-  // 옵션 로드/표시
+  // 옵션/실행기록 로드
   loadOptions();
   applyOptionsToUI();
+  loadRunsFromStorage();
+  populateExtraRunSelect();
 
-  // 로그인 버튼들
-  on('gsLoginBtn','click',requestAccess);
+  // 로그인 버튼
   on('loginMainBtn','click',requestAccess);
-  on('gsLogoutBtn','click',revokeAccess);
 
   // 화면 네비게이션
   document.querySelectorAll('.tile[data-goto]').forEach(t=>{
@@ -1391,7 +1498,13 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   // 관리자(옵션 탭) 이벤트
   on('admAdd','click',admAdd);
-  on('admClearAll','click',()=>{if(confirm('모든 연결을 삭제할까요?')){clearPacks();renderAdmList();populatePacks('A');populatePacks('B');}});
+  on('admClearAll','click',()=>{
+    if(confirm('모든 연결을 삭제할까요?')){
+      clearPacks();
+      renderAdmList();
+      populatePacks('A');populatePacks('B');
+    }
+  });
 
   on('optSave','click',()=>{
     readOptionsFromUI();
@@ -1423,6 +1536,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   // 추가 리포트 버튼
   on('extraRefresh','click',updateExtraReport);
+  on('extraSingleBtn','click',updateSingleExtraReport);
 
   // 초기 스프레드시트 상태
   renderAdmList();
