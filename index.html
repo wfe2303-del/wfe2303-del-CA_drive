@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>클래스어라운드 · 드라이브 폴더 모음</title>
 
-  <!-- Tailwind (이미 다른 페이지에서 쓰면 중복 제거 가능) -->
+  <!-- Tailwind (필요 없으면 제거 가능) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Identity Services (OAuth용) -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
     body { background:#f8fafc; }
@@ -28,11 +26,10 @@
         </p>
       </div>
       <div class="text-right text-xs text-slate-500 space-y-1">
-        <div id="login-status">🔒 Google Drive 미리보기 미연결</div>
-        <button id="btn-drive-connect"
-                class="mt-1 px-3 py-1 rounded-md border border-slate-300 text-xs font-medium hover:bg-slate-100">
-          드라이브 미리보기 사용 설정
-        </button>
+        <div id="proxy-status">🛰 Apps Script 프록시 사용 중</div>
+        <p class="text-[11px] text-slate-400">
+          폴더는 비공개 유지 · 이 페이지는 파일 제목만 표시
+        </p>
       </div>
     </header>
 
@@ -88,7 +85,13 @@
 
   <script>
     // ==============================
-    // 1. 폴더 목록 (네가 준 링크에서 ID만 추출)
+    // 1. Apps Script 웹앱 URL
+    // ==============================
+    const SCRIPT_URL = 'https://script.google.com/a/macros/classaround.co.kr/s/AKfycby0ixfDg41UDot43MlveRJGP5br-7wFAVvKjxVjPDEE_00JlpSH3sjmUHewuvgnRcxQ/exec'; 
+    // 예: 'https://script.google.com/macros/s/AKfycbXXXX/exec'
+
+    // ==============================
+    // 2. 폴더 목록 (네가 준 5개)
     // ==============================
     const FOLDERS = [
       {
@@ -123,15 +126,6 @@
       }
     ];
 
-    // ==============================
-    // 2. 전역 상태
-    // ==============================
-    const CLIENT_ID =
-      '18228268359-iifm4ck3j9kqj74eh1p90tco1k2mbpi0.apps.googleusercontent.com';
-
-    let driveTokenClient = null;
-    let driveAccessToken = null;
-    let pendingFolderId = null;
     let currentFolder = null;
 
     // ==============================
@@ -159,47 +153,7 @@
     }
 
     // ==============================
-    // 4. OAuth 초기화
-    // ==============================
-    function initDriveOAuth() {
-      if (!window.google || !google.accounts || !google.accounts.oauth2) {
-        console.error('Google Identity Services 로딩 전입니다.');
-        return;
-      }
-
-      driveTokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: 'https://www.googleapis.com/auth/drive.readonly',
-        callback: (tokenResponse) => {
-          driveAccessToken = tokenResponse.access_token;
-          document.getElementById('login-status').textContent =
-            '✅ Google Drive 미리보기 연결됨';
-
-          if (pendingFolderId) {
-            const folder = FOLDERS.find(f => f.id === pendingFolderId);
-            pendingFolderId = null;
-            if (folder) listFilesInFolder(folder);
-          }
-        }
-      });
-    }
-
-    function requestDriveAccess() {
-      if (!driveTokenClient) initDriveOAuth();
-      if (!driveTokenClient) {
-        alert('Google OAuth 초기화에 실패했습니다. 잠시 후 다시 시도해주세요.');
-        return;
-      }
-      if (driveAccessToken) {
-        document.getElementById('login-status').textContent =
-          '✅ Google Drive 미리보기 연결됨';
-        return;
-      }
-      driveTokenClient.requestAccessToken({ prompt: '' });
-    }
-
-    // ==============================
-    // 5. 폴더 클릭 & 파일 목록
+    // 4. 폴더 클릭 → Apps Script로 파일 목록 요청
     // ==============================
     function onFolderClick(folder) {
       currentFolder = folder;
@@ -216,86 +170,61 @@
         );
       };
 
-      if (!driveAccessToken) {
-        pendingFolderId = folder.id;
-        requestDriveAccess();
-      } else {
-        listFilesInFolder(folder);
-      }
+      listFilesInFolder(folder);
     }
 
-   async function listFilesInFolder(folder) {
-  const previewEl = document.getElementById('drive-preview');
-  previewEl.innerHTML = `
-    <div class="p-4 text-sm text-slate-500">
-      <span class="animate-pulse">파일 목록 불러오는 중...</span>
-    </div>
-  `;
-
-  try {
-    const params = new URLSearchParams({
-      q: `'${folder.id}' in parents and trashed = false`,
-      fields:
-        'files(id,name,mimeType,iconLink,webViewLink,modifiedTime,size)',
-      pageSize: '200',
-      orderBy: 'folder,name,modifiedTime desc'
-    });
-
-    const res = await fetch(
-      `https://www.googleapis.com/drive/v3/files?${params.toString()}`,
-      {
-        headers: { Authorization: `Bearer ${driveAccessToken}` }
-      }
-    );
-
-    // ★ 토큰 만료
-    if (res.status === 401) {
-      console.warn('401 Unauthorized (token 만료) → 재요청');
-      driveAccessToken = null;
-      pendingFolderId = folder.id;
-      requestDriveAccess();
-      return;
-    }
-
-    const data = await res.json();
-
-    // ★ API 실패(403, 400 등)면 에러 내용 보여주기
-    if (!res.ok) {
-      console.error('Drive API error:', data);
-      previewEl.innerHTML = `
-        <div class="p-4 text-sm text-red-500 space-y-2">
-          <div>Google Drive API 호출 중 오류가 발생했습니다.</div>
-          <div class="text-xs text-slate-500">
-            상태코드: ${res.status}<br>
-            메시지: ${data.error && data.error.message ? data.error.message : '알 수 없는 오류'}
-          </div>
-        </div>
-      `;
-      return;
-    }
-
-    const files = data.files || [];
-
-    if (!files.length) {
+    async function listFilesInFolder(folder) {
+      const previewEl = document.getElementById('drive-preview');
       previewEl.innerHTML = `
         <div class="p-4 text-sm text-slate-500">
-          이 폴더에 표시할 파일이 없습니다.
+          <span class="animate-pulse">파일 목록 불러오는 중...</span>
         </div>
       `;
-      return;
+
+      try {
+        const res = await fetch(
+          `${SCRIPT_URL}?folderId=${encodeURIComponent(folder.id)}`
+        );
+        const data = await res.json();
+
+        if (!data.ok) {
+          console.error('Apps Script error:', data);
+          previewEl.innerHTML = `
+            <div class="p-4 text-sm text-red-500 space-y-1">
+              <div>파일 목록을 불러오는 중 오류가 발생했습니다.</div>
+              <div class="text-xs text-slate-500">
+                ${data.error || ''} ${data.message ? '· ' + data.message : ''}
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        const files = data.files || [];
+
+        if (!files.length) {
+          previewEl.innerHTML = `
+            <div class="p-4 text-sm text-slate-500">
+              이 폴더에 표시할 파일이 없습니다.
+            </div>
+          `;
+          return;
+        }
+
+        renderFileList(previewEl, files);
+      } catch (err) {
+        console.error(err);
+        previewEl.innerHTML = `
+          <div class="p-4 text-sm text-red-500">
+            파일 목록을 불러오는 중 예외가 발생했습니다. (브라우저 콘솔 확인)
+          </div>
+        `;
+      }
     }
 
-    renderFileList(previewEl, files);
-  } catch (err) {
-    console.error(err);
-    previewEl.innerHTML = `
-      <div class="p-4 text-sm text-red-500">
-        파일 목록을 불러오는 중 예외가 발생했습니다. (브라우저 콘솔 로그 확인)
-      </div>
-    `;
-  }
-}
-
+    // ==============================
+    // 5. 파일 리스트 렌더링
+    // ==============================
     function renderFileList(containerEl, files) {
       const rows = files
         .map(file => {
@@ -307,7 +236,7 @@
           return `
             <button
               class="file-row w-full flex items-center text-left text-sm px-3 py-2 border-b border-slate-100 last:border-b-0"
-              onclick="window.open('${file.webViewLink}', '_blank')"
+              onclick="window.open('${file.url}', '_blank')"
             >
               <div class="flex-1 min-w-0">
                 <div class="truncate font-medium text-slate-800">
@@ -358,21 +287,6 @@
     // ==============================
     window.addEventListener('load', () => {
       renderFolderList();
-
-      document.getElementById('btn-drive-connect').onclick = () => {
-        requestDriveAccess();
-      };
-
-      if (window.google && google.accounts && google.accounts.oauth2) {
-        initDriveOAuth();
-      } else {
-        const timer = setInterval(() => {
-          if (window.google && google.accounts && google.accounts.oauth2) {
-            initDriveOAuth();
-            clearInterval(timer);
-          }
-        }, 300);
-      }
     });
   </script>
 </body>
