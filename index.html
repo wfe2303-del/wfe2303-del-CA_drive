@@ -3,591 +3,358 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>클래스어라운드 · 운영 대시보드</title>
+  <title>클래스어라운드 · 드라이브 폴더 모음</title>
 
-  <!-- Tailwind -->
+  <!-- Tailwind (이미 다른 페이지에서 쓰면 중복 제거 가능) -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Identity Services -->
+  <!-- Google Identity Services (OAuth용) -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <!-- Google API (Sheets/Drive) -->
-  <script src="https://apis.google.com/js/api.js" async defer></script>
 
   <style>
-    :root{
-      --blue:#2563eb;
-      --blue-soft:#eff6ff;
-      --red:#ef4444;
-      --bg:#f8fafc;
-    }
-    body{
-      margin:0;
-      background:var(--bg);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      color:#0f172a;
-    }
-    .card{
-      border-radius:16px;
-      border:1px solid #e5e7eb;
-      background:#fff;
-      box-shadow:0 10px 30px rgba(15,23,42,.06);
-    }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:0.35rem;
-      font-size:0.75rem;
-      padding:0.2rem 0.6rem;
-      border-radius:999px;
-      border:1px solid rgba(37,99,235,.18);
-      background:var(--blue-soft);
-      color:#1d4ed8;
-    }
-    .hidden{display:none!important;}
-    .toast{
-      position:fixed;
-      right:14px;
-      bottom:14px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:#0f172a;
-      color:#fff;
-      opacity:0;
-      box-shadow:0 6px 20px rgba(15,23,42,.35);
-      z-index:1000;
-      font-size:12px;
-      transform:translateY(8px);
-      pointer-events:none;
-      transition:.22s;
-    }
-    .toast.show{
-      opacity:.97;
-      transform:translateY(0);
-      pointer-events:auto;
-    }
+    body { background:#f8fafc; }
+    .folder-btn{transition:.15s}
+    .folder-btn:hover{background:#e5f0ff}
+    .file-row:hover{background:#f1f5f9}
   </style>
 </head>
-<body class="text-slate-900">
-  <div class="min-h-screen max-w-6xl mx-auto px-4 py-6 md:py-8">
-    <!-- 🔵 공통 헤더 (SVG 로고 버전) -->
-    <header class="flex items-center justify-between gap-4 mb-6">
-      <div class="flex items-center gap-3">
-        <!-- ClassAround SVG 로고 -->
-        <div class="h-14 flex items-center">
-          <svg class="w-24 h-12" viewBox="0 0 90 50" role="img" aria-label="ClassAround">
-            <rect width="90" height="50" rx="10" fill="white"/>
-            <circle cx="66" cy="10" r="8" fill="#6b8bd6"/>
-            <circle cx="80" cy="18" r="5" fill="#ef4444"/>
-            <text x="8" y="24"
-                  style="font-family:'Nunito','Arial Rounded MT','SF Pro Rounded','Quicksand','Pretendard','Noto Sans KR',sans-serif;
-                         font-weight:900; letter-spacing:-0.2px; fill:#0f172a; font-size:18px;
-                         paint-order:stroke fill; stroke:#0f172a; stroke-width:.9px;">
-              Class
-            </text>
-            <text x="8" y="42"
-                  style="font-family:'Nunito','Arial Rounded MT','SF Pro Rounded','Quicksand','Pretendard','Noto Sans KR',sans-serif;
-                         font-weight:900; letter-spacing:-0.2px; fill:#0f172a; font-size:18px;
-                         paint-order:stroke fill; stroke:#0f172a; stroke-width:.9px;">
-              Around
-            </text>
-          </svg>
-        </div>
-
-        <div>
-          <h1 class="text-xl md:text-2xl font-bold">클래스어라운드 운영 대시보드</h1>
-          <p class="text-xs md:text-sm text-slate-500 mt-1">
-            카카오톡 입장자 체크 · 수강생 시트 업데이트 · 드라이브 자료 모음
-          </p>
-        </div>
+<body class="min-h-screen text-slate-900">
+  <div class="max-w-6xl mx-auto px-4 py-6">
+    <!-- 헤더 -->
+    <header class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">클래스어라운드 운영 대시보드</h1>
+        <p class="text-sm text-slate-500">
+          카카오톡 입장자 체크 · 수강생 시트 업데이트 · 드라이브 자료 모음
+        </p>
       </div>
-
-      <!-- 로그인 상태 + 상단 탭 -->
-      <div class="flex flex-col items-end gap-1">
-        <div id="authState" class="text-xs md:text-sm text-slate-500">
-          Google 로그인 필요
-        </div>
-        <nav class="flex gap-1 text-[11px]">
-          <button data-nav="menu"
-                  class="px-2.5 py-1 rounded-full border border-slate-200 bg-white hover:bg-slate-50">
-            메인
-          </button>
-          <button data-nav="kakao"
-                  class="px-2.5 py-1 rounded-full border border-slate-200 bg-white hover:bg-slate-50">
-            카톡
-          </button>
-          <button data-nav="sync"
-                  class="px-2.5 py-1 rounded-full border border-slate-200 bg-white hover:bg-slate-50">
-            시트
-          </button>
-          <button data-nav="drive"
-                  class="px-2.5 py-1 rounded-full border border-slate-200 bg-white hover:bg-slate-50">
-            드라이브
-          </button>
-        </nav>
+      <div class="text-right text-xs text-slate-500 space-y-1">
+        <div id="login-status">🔒 Google Drive 미리보기 미연결</div>
+        <button id="btn-drive-connect"
+                class="mt-1 px-3 py-1 rounded-md border border-slate-300 text-xs font-medium hover:bg-slate-100">
+          드라이브 미리보기 사용 설정
+        </button>
       </div>
     </header>
 
-    <!-- 1) 로그인 화면 -->
-    <section id="screen-login" class="card max-w-md mx-auto mt-10">
-      <div class="p-5 md:p-6 text-center space-y-3">
-        <h2 class="text-base md:text-lg font-semibold">Google 계정으로 로그인</h2>
-        <p class="text-xs md:text-sm text-slate-500">
-          스프레드시트 / 드라이브 권한을 한 번 허용하면<br/>
-          아래의 운영 도구들을 한 화면에서 사용할 수 있습니다.
-        </p>
-        <button id="loginBtn"
-                type="button"
-                class="inline-flex items-center justify-center px-4 py-2.5 rounded-full text-sm md:text-base font-semibold bg-blue-600 text-white hover:bg-blue-700">
-          Google 로그인
-        </button>
-        <p class="text-[11px] text-slate-400 mt-2">
-          페이지 새로고침 시에는 다시 로그인해야 합니다.
-        </p>
-      </div>
-    </section>
-
-    <!-- 2) 메인 메뉴 (로그인 후) -->
-    <section id="screen-menu" class="hidden">
-      <section class="mb-6 mt-2">
-        <span class="pill">
-          <span class="w-2 h-2 rounded-full bg-green-500"></span>
-          <span>로그인 완료 · 사용할 기능을 선택하세요</span>
-        </span>
-        <p class="mt-2 text-xs md:text-sm text-slate-500">
-          카카오톡 입장자 체크, 수강생 시트 자동 업데이트, 드라이브 자료 모음을<br/>
-          한 페이지에서 이동하면서 사용할 수 있습니다.
-        </p>
-      </section>
-
-      <section class="grid md:grid-cols-3 gap-4 md:gap-5">
-        <!-- 카카오 -->
-        <article class="card p-4 flex flex-col justify-between">
+    <div class="grid grid-cols-[260px,1fr] gap-4">
+      <!-- 왼쪽: 폴더 리스트 -->
+      <aside class="bg-white rounded-2xl shadow border border-slate-100 p-4">
+        <div class="flex items-center mb-3">
+          <span class="text-xl mr-2">📂</span>
           <div>
-            <h2 class="text-base md:text-lg font-semibold mb-1 flex items-center gap-2">
-              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-xs font-bold">1</span>
-              카카오톡 입장자 체크봇
-            </h2>
-            <p class="text-xs md:text-sm text-slate-500 mb-3">
-              카톡방 채팅 로그(txt / csv)를 불러와서<br/>
-              공유용 시트 기준으로 <b class="text-blue-600">입장 · 퇴장</b> 상태를 자동 기록.
+            <p class="text-sm font-semibold">드라이브 폴더 모음</p>
+            <p class="text-xs text-slate-500">
+              좌측에서 폴더 선택 후 우측에서 파일 미리보기
             </p>
           </div>
-          <div class="mt-4 flex justify-between items-center">
-            <span class="text-[11px] text-slate-400">카카오톡 입장자 체크</span>
-            <button data-go="kakao"
-                    class="inline-flex items-center justify-center px-3 py-2 rounded-full text-xs md:text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700">
-              입장자 체크 화면 열기
-            </button>
-          </div>
-        </article>
+        </div>
 
-        <!-- 시트 -->
-        <article class="card p-4 flex flex-col justify-between">
+        <div id="folder-list" class="space-y-1 text-sm">
+          <!-- JS로 폴더 버튼 렌더링 -->
+        </div>
+      </aside>
+
+      <!-- 오른쪽: 파일 미리보기 -->
+      <main class="bg-white rounded-2xl shadow border border-slate-100 p-4 flex flex-col">
+        <div class="flex items-center justify-between mb-3">
           <div>
-            <h2 class="text-base md:text-lg font-semibold mb-1 flex items-center gap-2">
-              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-50 text-red-500 text-xs font-bold">2</span>
-              수강생 시트 자동 업데이트
-            </h2>
-            <p class="text-xs md:text-sm text-slate-500 mb-3">
-              카드 / 계좌 CSV를 업로드하면<br/>
-              결제 내역을 <b class="text-red-500">B2~N</b> 구간에 자동 정리 및 덮어쓰기.
+            <p class="text-xs text-slate-400">DRIVE FOLDER VIEW</p>
+            <p id="current-folder-title" class="text-base font-semibold mt-1">
+              폴더를 선택해주세요
+            </p>
+            <p id="current-folder-desc" class="text-xs text-slate-500">
+              좌측에서 폴더를 클릭하면 이 영역에 파일 목록이 표시됩니다.
             </p>
           </div>
-          <div class="mt-4 flex justify-between items-center">
-            <span class="text-[11px] text-slate-400">결제 내역 → 수강생 시트</span>
-            <button data-go="sync"
-                    class="inline-flex items-center justify-center px-3 py-2 rounded-full text-xs md:text-sm font-semibold bg-red-500 text-white hover:bg-red-600">
-              시트 업데이트 화면 열기
-            </button>
-          </div>
-        </article>
+          <button id="btn-open-newtab"
+                  class="px-3 py-1 rounded-full border border-slate-200 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  disabled>
+            새 탭에서 폴더 열기
+          </button>
+        </div>
 
-        <!-- 드라이브 -->
-        <article class="card p-4 flex flex-col justify-between">
-          <div>
-            <h2 class="text-base md:text-lg font-semibold mb-1 flex items-center gap-2">
-              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-xs font-bold">3</span>
-              드라이브 자료 모음
-            </h2>
-            <p class="text-xs md:text-sm text-slate-500 mb-3">
-              현금결제 폼, 강사 공유용 시트, 무료강의 자료 등<br/>
-              자주 쓰는 구글 드라이브 폴더를 한 번에 모아서 확인.
+        <div id="drive-preview"
+             class="mt-2 flex-1 border border-slate-100 rounded-xl bg-slate-50 overflow-auto">
+          <div class="h-full flex flex-col items-center justify-center text-slate-400 text-sm px-6 text-center">
+            <p class="mb-2">📁 왼쪽에서 폴더를 선택하면 파일 목록이 여기에 표시됩니다.</p>
+            <p class="text-xs">
+              드라이브 권한은 그대로 유지되고, 이 페이지에서는 파일 제목만 미리 보여줍니다.
             </p>
           </div>
-          <div class="mt-4 flex justify-between items-center">
-            <span class="text-[11px] text-slate-400">Drive 폴더 뷰어</span>
-            <button data-go="drive"
-                    class="inline-flex items-center justify-center px-3 py-2 rounded-full text-xs md:text-sm font-semibold bg-sky-500 text-white hover:bg-sky-600">
-              드라이브 화면 열기
-            </button>
-          </div>
-        </article>
-      </section>
-
-      <footer class="mt-8 text-[11px] text-slate-400 text-right">
-        © ClassAround Internal Tools (One Page)
-      </footer>
-    </section>
-
-    <!-- 3) 카카오 화면 -->
-    <section id="screen-kakao" class="hidden mt-2">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-sm md:text-base font-semibold flex items-center gap-2">
-          <span class="text-blue-600 text-lg">💬</span> 카카오톡 입장자 체크봇
-        </h2>
-        <button data-go="menu"
-                class="px-2.5 py-1.5 rounded-full border border-slate-200 bg-white text-[11px] hover:bg-slate-50">
-          ← 메인으로
-        </button>
-      </div>
-
-      <!-- ✅ 여기에 기존 kakao.html의 메인 UI 붙이기 -->
-      <div class="rounded-xl border border-slate-200 bg-white p-3 text-[13px] text-slate-600">
-        TODO: kakao 입장자 체크 UI + 로직 붙이기
-      </div>
-    </section>
-
-    <!-- 4) 시트(sync) 화면 -->
-    <section id="screen-sync" class="hidden mt-2">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-sm md:text-base font-semibold flex items-center gap-2">
-          <span class="text-red-500 text-lg">📑</span> 수강생 시트 자동 업데이트
-        </h2>
-        <button data-go="menu"
-                class="px-2.5 py-1.5 rounded-full border border-slate-200 bg-white text-[11px] hover:bg-slate-50">
-          ← 메인으로
-        </button>
-      </div>
-
-      <!-- ✅ 여기에 지금 쓰는 sync.html 본문 UI를 그대로 옮기면 됨 -->
-      <main id="syncMain" class="max-w-5xl mx-auto px-0 py-2 space-y-3">
-        <div class="rounded-xl border border-slate-200 bg-white px-3 py-3 text-[13px] text-slate-600">
-          TODO: 기존 sync UI(업로드/시트 설정/미리보기) + 로직 붙이기
         </div>
       </main>
-    </section>
-
-    <!-- 5) 드라이브 화면 -->
-    <section id="screen-drive" class="hidden mt-2">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-sm md:text-base font-semibold flex items-center gap-2">
-          <span class="text-sky-500 text-lg">📂</span> 드라이브 폴더 모음
-        </h2>
-        <button data-go="menu"
-                class="px-2.5 py-1.5 rounded-full border border-slate-200 bg-white text-[11px] hover:bg-slate-50">
-          ← 메인으로
-        </button>
-      </div>
-
-      <!-- 드라이브 폴더 UI -->
-      <section class="grid lg:grid-cols-[260px,minmax(0,1fr)] gap-5">
-        <aside class="bg-white rounded-2xl border border-slate-200 p-3 md:p-4 shadow-sm">
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="text-sm font-semibold flex items-center gap-1.5">
-              🔗 폴더 선택
-            </h2>
-          </div>
-          <div id="folderList" class="space-y-1.5 text-xs md:text-sm"></div>
-          <div class="mt-4 p-2.5 rounded-xl bg-sky-50 border border-sky-100 text-[11px] leading-relaxed text-sky-800">
-            ⓘ 선택한 폴더는 오른쪽에서 바로 미리보기 되고,<br />
-            새 탭에서 크게 보고 싶으면 상단 <b>「새 탭에서 열기」</b>를 눌러주세요.
-          </div>
-        </aside>
-
-        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col min-h-[460px]">
-          <div class="px-4 py-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div class="text-xs uppercase tracking-wide text-slate-400 font-semibold">
-                DRIVE FOLDER VIEW
-              </div>
-              <div class="flex items-center gap-2 mt-0.5">
-                <h2 id="currentFolderName" class="text-sm md:text-base font-semibold">
-                  폴더를 선택하세요
-                </h2>
-                <span id="currentFolderBadge"
-                      class="hidden md:inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium border border-slate-200 text-slate-500">
-                  -
-                </span>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <button id="btnOpenNewTab"
-                      class="px-3 py-1.5 rounded-full text-[11px] font-semibold border border-blue-500 text-blue-600 bg-blue-50 hover:bg-blue-100 disabled:opacity-40 disabled:cursor-default"
-                      disabled>
-                새 탭에서 열기
-              </button>
-            </div>
-          </div>
-          <div class="flex-1 bg-slate-50 rounded-b-2xl overflow-hidden">
-            <iframe
-              id="driveFrame"
-              src=""
-              title="Google Drive folder viewer"
-              class="w-full h-[420px] md:h-[520px] border-0 bg-slate-50">
-            </iframe>
-          </div>
-        </section>
-      </section>
-    </section>
+    </div>
   </div>
 
-  <div id="toast" class="toast"></div>
-
   <script>
-    const CLIENT_ID = "18228268359-iifm4ck3j9kqj74eh1p90tco1k2mbpi0.apps.googleusercontent.com";
+    // ==============================
+    // 1. 폴더 목록 (네가 준 링크에서 ID만 추출)
+    // ==============================
+    const FOLDERS = [
+      {
+        key: 'card',
+        name: '현금결제 구글폼',
+        desc: '현금/계좌 결제 응답 모음',
+        id: '1LdDYVwxDrpqpPy2HYlSnrw2w7YKhsKWF'
+      },
+      {
+        key: 'share',
+        name: '강사 공유용 시트',
+        desc: '강사진 공유 시트 & 자료',
+        id: '1t33dy_UQCfsvoEQ9yOctIxvoT623i-j4'
+      },
+      {
+        key: 'ebook',
+        name: '무료강의 전자책 구글폼',
+        desc: '무료 전자책 신청 응답',
+        id: '1C1OsgYqZtxauLNN9l4mRHPgaIavrhmq-'
+      },
+      {
+        key: 'qna',
+        name: '무료강의 사전 질문',
+        desc: '무료강의 Q&A / 사전질문 모음',
+        id: '1BU7ugKEeRXmG3PoRGJqKHlxuVtgT2_js'
+      },
+      {
+        key: 'live',
+        name: '라이브 자료',
+        desc: '라이브 방송 자료 · PPT 모음',
+        id: '1Ej6eIw0WwCn8NxtwW5A4vj8wo2xyKATC'
+      }
+    ];
 
-    let accessToken = null;
-    let tokenClient = null;
-    let gapiReady = false;
+    // ==============================
+    // 2. 전역 상태
+    // ==============================
+    const CLIENT_ID =
+      '18228268359-iifm4ck3j9kqj74eh1p90tco1k2mbpi0.apps.googleusercontent.com';
 
-    const $  = (s)=>document.querySelector(s);
-    const $$ = (s)=>Array.from(document.querySelectorAll(s));
+    let driveTokenClient = null;
+    let driveAccessToken = null;
+    let pendingFolderId = null;
+    let currentFolder = null;
 
-    function showToast(msg,type="info"){
-      const el=$("#toast"); if(!el) return;
-      el.textContent = msg;
-      if(type==="error") el.style.background="#b91c1c";
-      else if(type==="ok") el.style.background="#15803d";
-      else el.style.background="#0f172a";
-      el.classList.add("show");
-      setTimeout(()=> el.classList.remove("show"),2600);
-    }
+    // ==============================
+    // 3. 폴더 버튼 렌더링
+    // ==============================
+    function renderFolderList() {
+      const listEl = document.getElementById('folder-list');
+      listEl.innerHTML = '';
 
-    function setAuthState(text){
-      const el=$("#authState");
-      if(el) el.textContent=text;
-    }
-
-    function showScreen(name){
-      const ids=["login","menu","kakao","sync","drive"];
-      ids.forEach(id=>{
-        const sec=$("#screen-"+id);
-        if(!sec) return;
-        if(id===name) sec.classList.remove("hidden");
-        else sec.classList.add("hidden");
+      FOLDERS.forEach(folder => {
+        const btn = document.createElement('button');
+        btn.className =
+          'folder-btn w-full text-left px-3 py-2 rounded-xl border border-slate-100 bg-slate-50 ' +
+          'hover:border-sky-300 text-sm flex items-center justify-between';
+        btn.innerHTML = `
+          <div>
+            <div class="font-medium">${folder.name}</div>
+            <div class="text-[11px] text-slate-500">${folder.desc}</div>
+          </div>
+          <span class="text-[11px] px-2 py-0.5 rounded-full bg-white border border-slate-200">열기</span>
+        `;
+        btn.onclick = () => onFolderClick(folder);
+        listEl.appendChild(btn);
       });
     }
 
-    async function ensureGapi(){
-      if(!accessToken) throw new Error("먼저 Google 로그인을 진행해주세요.");
-      if(gapiReady) return;
-      await new Promise(res=>{
-        const chk=()=>{ if(window.gapi && gapi.load){res();} else setTimeout(chk,50); };
-        chk();
-      });
-      await new Promise((res,rej)=>{
-        gapi.load("client", async ()=>{
-          try{
-            await gapi.client.load("https://sheets.googleapis.com/$discovery/rest?version=v4");
-            gapi.client.setToken({access_token:accessToken});
-            gapiReady=true;
-            res();
-          }catch(e){ rej(e); }
-        });
-      });
-    }
-
-    function initAuthClient(){
-      if(!window.google?.accounts?.oauth2){
-        setTimeout(initAuthClient,120);
+    // ==============================
+    // 4. OAuth 초기화
+    // ==============================
+    function initDriveOAuth() {
+      if (!window.google || !google.accounts || !google.accounts.oauth2) {
+        console.error('Google Identity Services 로딩 전입니다.');
         return;
       }
-      tokenClient = google.accounts.oauth2.initTokenClient({
+
+      driveTokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
-        scope: "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.readonly",
-        prompt: "consent", // 접속할 때마다 선택
-        callback: (res)=>{
-          if(res && res.access_token){
-            accessToken = res.access_token;
-            setAuthState("로그인 완료 · 이 페이지에서 바로 사용 가능");
-            showToast("Google 로그인 성공","ok");
-            showScreen("menu");
-          }else{
-            setAuthState("로그인 실패 · 다시 시도해주세요");
-            showScreen("login");
+        scope: 'https://www.googleapis.com/auth/drive.readonly',
+        callback: (tokenResponse) => {
+          driveAccessToken = tokenResponse.access_token;
+          document.getElementById('login-status').textContent =
+            '✅ Google Drive 미리보기 연결됨';
+
+          if (pendingFolderId) {
+            const folder = FOLDERS.find(f => f.id === pendingFolderId);
+            pendingFolderId = null;
+            if (folder) listFilesInFolder(folder);
           }
         }
       });
     }
 
-    // ===== 드라이브 폴더 =====
-    const FOLDERS = [
-      {
-        id: "1LdDYVwxDrpqpPy2HYlSnrw2w7YKhsKWF",
-        name: "현금결제 구글폼",
-        desc: "현금/계좌 결제 응답 모음",
-        originalUrl: "https://drive.google.com/drive/folders/1LdDYVwxDrpqpPy2HYlSnrw2w7YKhsKWF?usp=drive_link"
-      },
-      {
-        id: "1t33dy_UQCfsvoEQ9yOctIxvoT623i-j4",
-        name: "강사 공유용 시트",
-        desc: "강사진 공유 시트 & 자료",
-        originalUrl: "https://drive.google.com/drive/folders/1t33dy_UQCfsvoEQ9yOctIxvoT623i-j4?usp=drive_link"
-      },
-      {
-        id: "1C1OsgYqZtxauLNN9l4mRHPgaIavrhmq-",
-        name: "무료강의 전자책 구글폼",
-        desc: "무료 전자책 신청 응답",
-        originalUrl: "https://drive.google.com/drive/u/0/folders/1C1OsgYqZtxauLNN9l4mRHPgaIavrhmq-"
-      },
-      {
-        id: "1BU7ugKEeRXmG3PoRGJqKHlxuVtgT2_js",
-        name: "무료강의 사전 질문",
-        desc: "무료강의 Q&A / 사전질문",
-        originalUrl: "https://drive.google.com/drive/folders/1BU7ugKEeRXmG3PoRGJqKHlxuVtgT2_js?usp=drive_link"
-      },
-      {
-        id: "1Ej6eIw0WwCn8NxtwW5A4vj8wo2xyKATC",
-        name: "라이브 자료",
-        desc: "라이브 방송 자료·PPT 모음",
-        originalUrl: "https://drive.google.com/drive/folders/1Ej6eIw0WwCn8NxtwW5A4vj8wo2xyKATC?usp=drive_link"
+    function requestDriveAccess() {
+      if (!driveTokenClient) initDriveOAuth();
+      if (!driveTokenClient) {
+        alert('Google OAuth 초기화에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        return;
       }
-    ];
-    function driveEmbedUrl(id){
-      return `https://drive.google.com/embeddedfolderview?id=${encodeURIComponent(id)}#list`;
+      if (driveAccessToken) {
+        document.getElementById('login-status').textContent =
+          '✅ Google Drive 미리보기 연결됨';
+        return;
+      }
+      driveTokenClient.requestAccessToken({ prompt: '' });
     }
-    function initDriveScreen(){
-      const folderListEl = $("#folderList");
-      const driveFrameEl = $("#driveFrame");
-      const currentFolderName = $("#currentFolderName");
-      const currentFolderBadge = $("#currentFolderBadge");
-      const btnOpenNewTab = $("#btnOpenNewTab");
-      if(!folderListEl || !driveFrameEl) return;
 
-      let currentFolderId = null;
+    // ==============================
+    // 5. 폴더 클릭 & 파일 목록
+    // ==============================
+    function onFolderClick(folder) {
+      currentFolder = folder;
 
-      function renderButtons(){
-        folderListEl.innerHTML="";
-        FOLDERS.forEach(f=>{
-          const btn=document.createElement("button");
-          btn.type="button";
-          btn.dataset.folderId=f.id;
-          btn.className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50 text-left transition";
-          btn.innerHTML=`
-            <div class="flex items-center gap-2">
-              <div class="dot w-1.5 h-1.5 rounded-full bg-slate-300"></div>
-              <div>
-                <div class="font-semibold text-xs md:text-[13px] truncate">${f.name}</div>
-                <div class="text-[11px] text-slate-500 truncate">${f.desc}</div>
-              </div>
+      document.getElementById('current-folder-title').textContent = folder.name;
+      document.getElementById('current-folder-desc').textContent = folder.desc;
+
+      const openBtn = document.getElementById('btn-open-newtab');
+      openBtn.disabled = false;
+      openBtn.onclick = () => {
+        window.open(
+          `https://drive.google.com/drive/folders/${folder.id}`,
+          '_blank'
+        );
+      };
+
+      if (!driveAccessToken) {
+        pendingFolderId = folder.id;
+        requestDriveAccess();
+      } else {
+        listFilesInFolder(folder);
+      }
+    }
+
+    async function listFilesInFolder(folder) {
+      const previewEl = document.getElementById('drive-preview');
+      previewEl.innerHTML = `
+        <div class="p-4 text-sm text-slate-500">
+          <span class="animate-pulse">파일 목록 불러오는 중...</span>
+        </div>
+      `;
+
+      try {
+        const params = new URLSearchParams({
+          q: `'${folder.id}' in parents and trashed = false`,
+          fields:
+            'files(id,name,mimeType,iconLink,webViewLink,modifiedTime,size)',
+          pageSize: '200',
+          orderBy: 'folder,name,modifiedTime desc'
+        });
+
+        const res = await fetch(
+          `https://www.googleapis.com/drive/v3/files?${params.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${driveAccessToken}` }
+          }
+        );
+
+        if (res.status === 401) {
+          driveAccessToken = null;
+          pendingFolderId = folder.id;
+          requestDriveAccess();
+          return;
+        }
+
+        const data = await res.json();
+        const files = data.files || [];
+
+        if (!files.length) {
+          previewEl.innerHTML = `
+            <div class="p-4 text-sm text-slate-500">
+              이 폴더에 표시할 파일이 없습니다.
             </div>
-            <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-slate-200 text-slate-500">열기</span>`;
-          btn.addEventListener("click",()=>selectFolder(f.id));
-          folderListEl.appendChild(btn);
-        });
-      }
-      function updateActive(){
-        folderListEl.querySelectorAll("button[data-folder-id]").forEach(b=>{
-          if(b.dataset.folderId===currentFolderId){
-            b.classList.add("border-blue-400","bg-blue-50");
-          }else{
-            b.classList.remove("border-blue-400","bg-blue-50");
-          }
-        });
-      }
-      function selectFolder(id){
-        const f=FOLDERS.find(x=>x.id===id);
-        if(!f) return;
-        currentFolderId=id;
-        driveFrameEl.src=driveEmbedUrl(f.id);
-        currentFolderName.textContent=f.name;
-        currentFolderBadge.textContent=f.desc||"";
-        currentFolderBadge.classList.remove("hidden");
-        btnOpenNewTab.disabled=false;
-        btnOpenNewTab.onclick=()=>window.open(f.originalUrl,"_blank","noopener");
-        updateActive();
-      }
+          `;
+          return;
+        }
 
-      renderButtons();
-      if(FOLDERS.length>0) selectFolder(FOLDERS[0].id);
+        renderFileList(previewEl, files);
+      } catch (err) {
+        console.error(err);
+        previewEl.innerHTML = `
+          <div class="p-4 text-sm text-red-500">
+            파일 목록을 불러오는 중 오류가 발생했습니다. (콘솔 로그 확인)
+          </div>
+        `;
+      }
     }
 
-    let kakaoInited=false;
-    let syncInited=false;
-    let driveInited=false;
+    function renderFileList(containerEl, files) {
+      const rows = files
+        .map(file => {
+          const date = file.modifiedTime
+            ? new Date(file.modifiedTime).toLocaleString()
+            : '-';
+          const sizeStr = file.size ? formatBytes(Number(file.size)) : '-';
 
-    function initKakaoTool(){
-      if(kakaoInited) return;
-      kakaoInited=true;
-      // 🔵 여기 안에 기존 kakao 로직 붙이기 (Google Sheets 필요하면 ensureGapi() 호출 후 사용)
+          return `
+            <button
+              class="file-row w-full flex items-center text-left text-sm px-3 py-2 border-b border-slate-100 last:border-b-0"
+              onclick="window.open('${file.webViewLink}', '_blank')"
+            >
+              <div class="flex-1 min-w-0">
+                <div class="truncate font-medium text-slate-800">
+                  ${escapeHtml(file.name)}
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">
+                  ${file.mimeType} · 수정: ${date}
+                </div>
+              </div>
+              <div class="text-[11px] text-slate-500 ml-3 whitespace-nowrap">
+                ${sizeStr}
+              </div>
+            </button>
+          `;
+        })
+        .join('');
+
+      containerEl.innerHTML = `
+        <div
+          class="text-[11px] text-slate-500 px-3 py-2 border-b border-slate-100 bg-slate-50/60 sticky top-0 z-10 flex justify-between"
+        >
+          <span>총 ${files.length}개 파일</span>
+          <span>클릭 시 새 탭에서 열립니다.</span>
+        </div>
+        <div>${rows}</div>
+      `;
     }
 
-    function initSyncTool(){
-      if(syncInited) return;
-      syncInited=true;
-      // 🔴 여기 안에 기존 sync 코드의 document.addEventListener('DOMContentLoaded', ...) 부분 내용 옮기기
-      // 인증 관련은 지우고, sheets 호출 전에는 await ensureGapi(); 사용
+    function formatBytes(bytes) {
+      if (!bytes || bytes === 0) return '-';
+      const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(1024));
+      const value = bytes / Math.pow(1024, i);
+      return `${value.toFixed(1)} ${units[i]}`;
     }
 
-    window.addEventListener("load", ()=>{
-      initAuthClient();
-      showScreen("login");
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
-      const loginBtn=$("#loginBtn");
-      if(loginBtn){
-        loginBtn.addEventListener("click",()=>{
-          if(!tokenClient){
-            alert("Google 로그인 초기화 중입니다. 잠시 후 다시 시도해주세요.");
-            return;
+    // ==============================
+    // 6. onload
+    // ==============================
+    window.addEventListener('load', () => {
+      renderFolderList();
+
+      document.getElementById('btn-drive-connect').onclick = () => {
+        requestDriveAccess();
+      };
+
+      if (window.google && google.accounts && google.accounts.oauth2) {
+        initDriveOAuth();
+      } else {
+        const timer = setInterval(() => {
+          if (window.google && google.accounts && google.accounts.oauth2) {
+            initDriveOAuth();
+            clearInterval(timer);
           }
-          tokenClient.requestAccessToken();
-        });
+        }, 300);
       }
-
-      // 메인/상단 네비용 버튼
-      $$("[data-go]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const target=btn.getAttribute("data-go");
-          if(target==="menu"){
-            if(accessToken) showScreen("menu");
-            else showScreen("login");
-            return;
-          }
-          if(!accessToken){
-            showToast("먼저 로그인하세요","error");
-            showScreen("login");
-            return;
-          }
-          if(target==="kakao"){
-            showScreen("kakao");
-            initKakaoTool();
-          }else if(target==="sync"){
-            try{ await ensureGapi(); }catch(e){ showToast(e.message,"error"); return; }
-            showScreen("sync");
-            initSyncTool();
-          }else if(target==="drive"){
-            showScreen("drive");
-            if(!driveInited){ initDriveScreen(); driveInited=true; }
-          }
-        });
-      });
-
-      $$("[data-nav]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const dest=btn.getAttribute("data-nav");
-          if(dest==="menu"){
-            if(accessToken) showScreen("menu"); else showScreen("login");
-          }else if(dest==="kakao"){
-            if(!accessToken){ showToast("먼저 로그인하세요","error"); showScreen("login"); return; }
-            showScreen("kakao"); initKakaoTool();
-          }else if(dest==="sync"){
-            if(!accessToken){ showToast("먼저 로그인하세요","error"); showScreen("login"); return; }
-            try{ await ensureGapi(); }catch(e){ showToast(e.message,"error"); return; }
-            showScreen("sync"); initSyncTool();
-          }else if(dest==="drive"){
-            if(!accessToken){ showToast("먼저 로그인하세요","error"); showScreen("login"); return; }
-            showScreen("drive");
-            if(!driveInited){ initDriveScreen(); driveInited=true; }
-          }
-        });
-      });
-    });
-
-    window.addEventListener("error", e=>{
-      showToast("오류: "+(e?.error?.message||e.message||"알 수 없는 오류"),"error");
-    });
-    window.addEventListener("unhandledrejection", e=>{
-      showToast("처리되지 않은 오류: "+(e?.reason?.message||e.reason||"알 수 없는 오류"),"error");
     });
   </script>
 </body>
