@@ -12,28 +12,40 @@
 
   <style>
     body { background:#f8fafc; }
-    .folder-btn{transition:.15s}
-    .folder-btn:hover{background:#e5f0ff}
+
     .file-row:hover{background:#f1f5f9}
+
+    /* 입장자 체크봇 로고 스타일 참고 */
+    :root{
+      --logo-size:48px;
+    }
+    .brand{display:flex;align-items:center;gap:14px;margin:0 0 6px}
+    .brand h1{margin:0;font-size:22px}
+    .brand-logo{width:var(--logo-size);height:calc(var(--logo-size)*1.1);flex:0 0 var(--logo-size)}
+    .logo-text{
+      font-family:'Nunito','Arial Rounded MT','SF Pro Rounded','Quicksand','Pretendard','Noto Sans KR',sans-serif;
+      font-weight:900; letter-spacing:-0.2px; fill:#0f172a; font-size:16px;
+      paint-order:stroke fill; stroke:#0f172a; stroke-width:.9px;
+    }
   </style>
 </head>
 <body class="min-h-screen text-slate-900">
   <div class="max-w-6xl mx-auto px-4 py-6">
-    <!-- 헤더 -->
+    <!-- 헤더 : 입장자 체크봇 로고 참고 -->
     <header class="flex items-center justify-between mb-6 gap-4">
-      <div class="flex items-center gap-3 min-w-0">
-        <!-- 클래스어라운드 로고 박스 -->
-        <div class="flex items-center justify-center w-11 h-11 rounded-2xl bg-sky-600 text-white text-[10px] leading-tight font-extrabold shadow-sm">
-          <div class="text-center">
-            <div>CLASS</div>
-            <div>AROUND</div>
-          </div>
-        </div>
-        <div class="min-w-0">
-          <p class="text-[11px] text-slate-400 font-semibold">클래스어라운드</p>
-          <h1 class="text-xl font-bold truncate">클어 운영 드라이브</h1>
-          <p class="text-[11px] text-slate-500 truncate">
-            카카오톡 입장자 체크 · 수강생 시트 · 드라이브 자료 모음
+      <div class="brand">
+        <!-- 같은 SVG 로고 -->
+        <svg class="brand-logo" viewBox="0 0 90 50" role="img" aria-label="ClassAround">
+          <rect width="90" height="50" rx="10" fill="white"/>
+          <circle cx="66" cy="10" r="8" fill="#6b8bd6"/>
+          <circle cx="80" cy="18" r="5" fill="#ef4444"/>
+          <text x="8" y="24" class="logo-text">Class</text>
+          <text x="8" y="42" class="logo-text">Around</text>
+        </svg>
+        <div>
+          <p class="text-[11px] text-slate-400 font-semibold"></p>
+          <h1 class="text-xl font-bold">클어 운영 드라이브</h1>
+          <p class="text-[11px] text-slate-500">
           </p>
         </div>
       </div>
@@ -47,13 +59,12 @@
           </button>
         </div>
         <p class="text-[11px] text-slate-400" id="proxy-status">
-          🛰 Apps Script 프록시 사용 중 · 폴더는 비공개 유지
         </p>
       </div>
     </header>
 
     <div class="grid grid-cols-[260px,1fr] gap-4">
-      <!-- 왼쪽: 폴더 리스트 -->
+      <!-- 왼쪽: 루트 폴더 리스트 -->
       <aside class="bg-white rounded-2xl shadow border border-slate-100 p-4">
         <div class="flex items-center mb-3">
           <span class="text-xl mr-2">📂</span>
@@ -118,9 +129,10 @@
     // ==============================
     // 1. 설정
     // ==============================
-    const SCRIPT_URL = 'https://script.google.com/a/macros/classaround.co.kr/s/AKfycbyyxQFcQ1t5hxX0yu8Q0XHgexJwEOuqXoPVaPRTJGCX_q8YQnLPhxVwuZQyAhig-dIC/exec';
+    const SCRIPT_URL = 'https://script.google.com/a/macros/classaround.co.kr/s/AKfycby0ixfDg41UDot43MlveRJGP5br-7wFAVvKjxVjPDEE_00JlpSH3sjmUHewuvgnRcxQ/exec';
     const CLIENT_ID = '18228268359-iifm4ck3j9kqj74eh1p90tco1k2mbpi0.apps.googleusercontent.com';
 
+    // 루트 폴더 목록
     const FOLDERS = [
       {
         key: 'card',
@@ -240,8 +252,8 @@
       FOLDERS.forEach(folder => {
         const btn = document.createElement('button');
         btn.className =
-          'folder-btn w-full text-left px-3 py-2 rounded-xl border border-slate-100 bg-slate-50 ' +
-          'hover:border-sky-300 text-sm flex items-center justify-between';
+          'w-full text-left px-3 py-2 rounded-xl border border-slate-100 bg-slate-50 ' +
+          'hover:border-sky-300 text-sm flex items-center justify-between transition';
         btn.innerHTML = `
           <div>
             <div class="font-medium">${folder.name}</div>
@@ -505,7 +517,7 @@
             enterSubfolder(file);
           });
         } else {
-          // 파일은 단일 클릭으로 오픈
+          // 파일은 한 번 클릭으로 열기
           row.addEventListener('click', () => {
             window.open(file.url, '_blank');
           });
@@ -523,15 +535,6 @@
       const i = Math.floor(Math.log(bytes) / Math.log(1024));
       const value = bytes / Math.pow(1024, i);
       return `${value.toFixed(1)} ${units[i]}`;
-    }
-
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
     }
 
     // ==============================
@@ -564,7 +567,6 @@
         }
       }, 300);
 
-      // 로그인 버튼 핸들러
       const btnLogin = document.getElementById('btn-login');
       if (btnLogin) btnLogin.onclick = handleLoginClick;
     });
